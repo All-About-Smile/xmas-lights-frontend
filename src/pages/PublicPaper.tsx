@@ -49,13 +49,32 @@ const PublicPaperPage = () => {
             ? '크리스마스가 되어 모든 편지가 열렸어요.'
             : `${paper.openDate}에 공개됩니다. 지금도 새 편지를 받을 수 있어요!`}
         </p>
-      </div>
+      </div> 
 
-      <div className="window-area"> 
-        <div className="window-snow" aria-hidden /> 
-        <div className="window-ground" aria-hidden /> 
-        <div className="window-frame" aria-label="arched window frame"> 
-          <div className="window-bg-top" aria-hidden /> 
+      <div className="window-area">  
+        <div className="window-flakes" aria-hidden> 
+          {Array.from({ length: 48 }).map((_, i) => (
+            <span
+              key={i}
+              className="flake"
+              style={
+                {
+                  left: `${(i * 23) % 100}%`,
+                  '--dur': `${14 + (i % 8)}s`,
+                  '--delay': `${(i * 0.47) % 18}s`,
+                  '--sx': `${((i % 10) - 5) * 1.2}%`,
+                  '--ex': `${(((i + 6) % 10) - 5) * 1.2}%`,
+                  width: `${7 + (i % 3)}px`,
+                  height: `${7 + (i % 3)}px`,
+                } as React.CSSProperties
+              }
+            />
+          ))} 
+        </div> 
+        <div className="window-snow" aria-hidden />  
+        <div className="window-ground" aria-hidden />  
+        <div className="window-frame" aria-label="arched window frame">  
+          <div className="window-bg-top" aria-hidden />  
           <div className="window-bg-bottom" aria-hidden /> 
           <div className="window-frame-top" /> 
           <div className="window-frame-bottom" /> 

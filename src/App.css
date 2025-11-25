@@ -688,17 +688,36 @@
     radial-gradient(8px 8px at 45% 50%, rgba(255, 255, 255, 0.9), transparent 60%); 
   background-size: 220px 260px;
   background-repeat: repeat;
+  background-position: 0 -100%;
   animation: snow-scroll 18s linear infinite; 
   opacity: 0.8; 
 } 
 
 .window-snow::after { 
   animation-duration: 26s; 
-  animation-delay: -6s; 
+  animation-delay: -9s; 
   background-size: 260px 300px;
   filter: blur(0.5px); 
   opacity: 0.65; 
+  animation-name: snow-scroll-alt; 
 } 
+
+.window-flakes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.flake {
+  position: absolute;
+  top: -12%;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 50%;
+  animation: flake-fall var(--dur, 16s) ease-in infinite;
+  animation-delay: var(--delay, 0s);
+}
 
 .window-area {
   position: relative;
@@ -829,11 +848,29 @@
   left: 41%; 
 }
 
-@keyframes snow-scroll {
+@keyframes snow-scroll { 
+  0% { 
+    transform: translate(-4%, -100%); 
+  } 
+  100% { 
+    transform: translate(6%, 100%); 
+  } 
+} 
+
+@keyframes snow-scroll-alt { 
+  0% { 
+    transform: translate(6%, -100%); 
+  } 
+  100% { 
+    transform: translate(-4%, 100%); 
+  } 
+} 
+
+@keyframes flake-fall {
   0% {
-    transform: translateY(0);
+    transform: translate(var(--sx, 0), -20%);
   }
   100% {
-    transform: translateY(100%);
+    transform: translate(var(--ex, 0), 115%);
   }
 }
