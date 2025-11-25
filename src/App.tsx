@@ -1,35 +1,37 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Layout from './components/Layout';
+import HomePage from './pages/Home';
+import LoginPage from './pages/Login';
+import SignupPage from './pages/Signup';
+import MyPage from './pages/MyPage';
+import PublicPaperPage from './pages/PublicPaper';
+import WriteLetterPage from './pages/WriteLetter';
+import LetterDetailPage from './pages/LetterDetail';
+import type { Session } from './types';
+import { bootstrapDemoSession } from './services/mockApi';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [session, setSession] = useState<Session | null>(bootstrapDemoSession());
+
+  const handleLogout = () => setSession(null);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <BrowserRouter>
+      <Layout session={session} onLogout={handleLogout}>
+        <Routes>
+          <Route path="/" element={<HomePage session={session} />} />
+          <Route path="/login" element={<LoginPage onAuth={setSession} />} />
+          <Route path="/signup" element={<SignupPage onAuth={setSession} />} />
+          <Route path="/my" element={<MyPage session={session} />} />
+          <Route path="/:userId" element={<PublicPaperPage />} />
+          <Route path="/:userId/write" element={<WriteLetterPage />} />
+          <Route path="/:userId/letters/:letterId" element={<LetterDetailPage />} />
+        </Routes>
+      </Layout>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
