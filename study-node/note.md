@@ -25,3 +25,69 @@ setToDos((current) => [...current, toDo]); // O
 
     }, []);
 ```
+
+## react-router-dom
+### 사용법
+```js
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App.jsx";
+import { BrowserRouter } from "react-router-dom";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
+);
+```
+```js
+import { Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+    </Routes>
+  );
+}
+
+export default App;
+```
+### 페이지 이동 방법
+`<a>`는 페이지가 새로고침 되기 때문에 절대 사용하면 안된다.
+```js
+import { Link } from "react-router-dom";
+
+function Home() {
+  return (
+    <div>
+      <h1>HOME</h1>
+      <Link to="/login">로그인하러 가기</Link>
+    </div>
+  );
+}
+```
+### 코드로 페이지 이동하기 (useNavigate)
+```js
+import { useNavigate } from "react-router-dom";
+
+function Login() {
+  const navigate = useNavigate();
+
+  const goHome = () => {
+    navigate("/");
+  };
+
+  return (
+    <>
+      <h1>Login</h1>
+      <button onClick={goHome}>홈으로 이동</button>
+    </>
+  );
+}
+```
