@@ -1,12 +1,8 @@
-import './App.css'
-import TailWindTestPage from './pages/test/TailWindTestPage'
+import GlobalSettingTestPage from './pages/test/GlobalSettingTestPage'
 
 function App() {
-
   return (
-    <>
-      <TailWindTestPage />
-    </>
+    <GlobalSettingTestPage />
   )
 }
 
