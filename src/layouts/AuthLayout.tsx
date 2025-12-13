@@ -1,11 +1,14 @@
 // src/layouts/AuthLayout.tsx
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
-
 interface AuthLayoutProps {
   title: string;
   children: ReactNode;
 }
+
+
+
+        
 
 export function AuthLayout({ title, children }: AuthLayoutProps) {
   return (
