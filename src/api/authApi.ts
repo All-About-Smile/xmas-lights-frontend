@@ -20,7 +20,7 @@ export const authApi = {
 
   // ✅ me도 ApiResponse<MeResponse>
   me: () =>
-    apiClient.get<ApiResponse<MeResponse>>("/auth/me"),
+    apiClient.get<ApiResponse<MeResponse>>("/users/me"),
 
   // refresh도 네 서버가 래퍼면 이렇게
   refresh: () =>
