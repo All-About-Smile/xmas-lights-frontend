@@ -13,7 +13,7 @@ import { authApi } from "../api/authApi";
 function RegisterPage() {
   const navigate = useNavigate();
 
-  const [id, setId] = useState(""); // userid로 보낼 값
+  const [id, setId] = useState(""); // 닉네임(한글 5글자 제한) -> 백엔드로 userid로 보냄
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [email, setEmail] = useState("");
@@ -21,16 +21,51 @@ function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // ✅ 유효성 검사 정규식
+  // 닉네임: 한글 1~5글자
+  const nicknameRegex = /^[가-힣]{1,5}$/;
+
+  // 비밀번호: 최소 8자 + 대문자/소문자/숫자/특수문자 포함
+  // (특수문자: 공백 제외, 어떤 기호든 OK)
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/;
+
+  // 이메일: 기본 형식 체크(너무 빡세게 검증하지 않는 버전)
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
 
-    if (!id || !email || !password) {
+    // 1) 빈 값 체크
+    if (!id || !email || !password || !passwordConfirm) {
       setErrorMsg("아이디, 이메일, 비밀번호를 모두 입력해줘.");
       return;
     }
+
+    // 2) 닉네임 체크
+    if (!nicknameRegex.test(id)) {
+      setErrorMsg("아이디는 한글 1~5글자로 입력해줘.");
+      return;
+    }
+
+    // 3) 비밀번호 규칙 체크
+    if (!passwordRegex.test(password)) {
+      setErrorMsg(
+        "비밀번호는 8자리 이상 + 대문자/소문자/숫자/특수문자를 모두 포함해야 해."
+      );
+      return;
+    }
+
+    // 4) 비밀번호 확인
     if (password !== passwordConfirm) {
       setErrorMsg("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
+    // 5) 이메일 형식 체크 (요구사항: 팝업)
+    if (!emailRegex.test(email)) {
+      alert("이메일 형식이 올바르지 않습니다.");
       return;
     }
 
@@ -45,7 +80,6 @@ function RegisterPage() {
       });
 
       // ✅ 가입 성공 → 로그인 페이지로 이동
-      // 너 프로젝트는 /login2가 진짜 로그인 페이지였지? 아니면 /login으로 통일해도 됨.
       navigate("/login", { replace: true });
     } catch (err: any) {
       console.error("REGISTER ERROR:", err);
@@ -67,6 +101,8 @@ function RegisterPage() {
           <Input
             value={id}
             onChange={(e) => setId(e.target.value)}
+            placeholder="한글 1~5글자"
+            autoComplete="nickname"
             className="h-14 rounded-xl border-none bg-[#F8EFD4] shadow-[0_4px_10px_rgba(0,0,0,0.08)]"
           />
         </div>
@@ -77,6 +113,8 @@ function RegisterPage() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            placeholder="8자+대/소문자+숫자+특수문자"
+            autoComplete="new-password"
             className="h-14 rounded-xl border-none bg-[#F8EFD4] shadow-[0_4px_10px_rgba(0,0,0,0.08)]"
           />
         </div>
@@ -87,6 +125,7 @@ function RegisterPage() {
             type="password"
             value={passwordConfirm}
             onChange={(e) => setPasswordConfirm(e.target.value)}
+            autoComplete="new-password"
             className="h-14 rounded-xl border-none bg-[#F8EFD4] shadow-[0_4px_10px_rgba(0,0,0,0.08)]"
           />
         </div>
@@ -97,6 +136,8 @@ function RegisterPage() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            placeholder="example@email.com"
+            autoComplete="email"
             className="h-14 rounded-xl border-none bg-[#F8EFD4] shadow-[0_4px_10px_rgba(0,0,0,0.08)]"
           />
         </div>

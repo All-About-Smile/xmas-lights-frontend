@@ -8,8 +8,7 @@ import Input from "../components/ui/Input";
 import Label from "../components/ui/Label";
 import Button from "../components/ui/Button";
 
-import { authApi } from "../api/authApi";
-import { tokenStorage } from "../lib/tokenStorage";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -19,6 +18,8 @@ export default function LoginPage() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const { login } = useAuth();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -32,21 +33,11 @@ export default function LoginPage() {
     try {
       setIsLoading(true);
 
-      // 1) 로그인 → access_token 발급(서버)
-      const loginRes = await authApi.login({
-        userid: id,
-        password,
-      });
+      // ✅ 로그인(토큰 저장 + me 갱신)은 AuthContext가 담당
+      await login(id, password);
 
-      // 2) 저장(프론트)
-      tokenStorage.setAccessToken(loginRes.data.access_token);
-
-      // 3) /auth/me로 검증
-      const meRes = await authApi.me();
-      console.log("ME OK:", meRes.data);
-
-      // 4) 이동
-      navigate("/", { replace: true });
+      // ✅ 성공하면 이동
+      navigate("/home", { replace: true });
     } catch (err: any) {
       console.error("LOGIN ERROR:", err);
 

@@ -1,7 +1,14 @@
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import type { ReactNode } from "react";
+// src/contexts/AuthContext.tsx
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { authApi } from "../api/authApi";
-import type { MeResponse } from "../types/auth";
+import type { MeResponse, LoginRequest } from "../types/auth";
 import { tokenStorage } from "../lib/tokenStorage";
 
 type AuthContextValue = {
@@ -21,10 +28,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshMe = async () => {
     const meRes = await authApi.me();
-    setUser(meRes.data);
+    setUser(meRes.data.data); // ✅ 래퍼에서 data 꺼내기
   };
 
-  // ✅ 앱 시작 시 로그인 복원 (새로고침 유지)
   useEffect(() => {
     const init = async () => {
       try {
@@ -34,8 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           return;
         }
         await refreshMe();
-      } catch (err) {
-        // 토큰이 있는데 me가 실패하면 → 토큰 제거 + 로그인 해제
+      } catch {
         tokenStorage.removeAccessToken();
         setUser(null);
       } finally {
@@ -47,8 +52,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (userid: string, password: string) => {
-    const loginRes = await authApi.login({ userid, password } as any);
-    tokenStorage.setAccessToken(loginRes.data.access_token);
+    const payload: LoginRequest = { userid, password };
+    const loginRes = await authApi.login(payload);
+
+    // ✅ login 응답: { code, message, data: { access_token, token_type } }
+    tokenStorage.setAccessToken(loginRes.data.data.access_token);
+
     await refreshMe();
   };
 

@@ -1,19 +1,30 @@
 // src/api/authApi.ts
 import apiClient from "../lib/apiClient";
-import type { LoginRequest, RegisterRequest, MeResponse, LoginResponse } from "../types/auth";
+import type { ApiResponse } from "../types/api";
+import type {
+  LoginRequest,
+  RegisterRequest,
+  MeResponse,
+  RegisterResponse,
+  LoginResponse,
+  RefreshResponse,
+} from "../types/auth";
 
 export const authApi = {
   register: (data: RegisterRequest) =>
-    apiClient.post("/auth/register", data),
+    apiClient.post<ApiResponse<RegisterResponse>>("/auth/register", data),
 
+  // ✅ login도 ApiResponse<LoginResponse>
   login: (data: LoginRequest) =>
-    apiClient.post<LoginResponse>("/auth/login", data),
+    apiClient.post<ApiResponse<LoginResponse>>("/auth/login", data),
 
+  // ✅ me도 ApiResponse<MeResponse>
   me: () =>
-    apiClient.get<MeResponse>("/auth/me"),
+    apiClient.get<ApiResponse<MeResponse>>("/auth/me"),
 
+  // refresh도 네 서버가 래퍼면 이렇게
   refresh: () =>
-    apiClient.post<LoginResponse>("/auth/refresh", {}),
+    apiClient.post<ApiResponse<RefreshResponse>>("/auth/refresh", {}),
 
   logout: () =>
     apiClient.post("/auth/logout", {}),
