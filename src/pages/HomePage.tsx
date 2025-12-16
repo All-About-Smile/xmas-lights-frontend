@@ -1,19 +1,36 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import SideDrawer from "../components/SideDrawer";
 import { useAuth } from "../contexts/AuthContext";
 
+import Scene from "../components/scene/Scene";
+import type { BulbItem } from "../components/scene/types";
+
 export default function HomePage() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const displayName = useMemo(() => {
-    // userid가 me 응답에 없으면 email로 대체
     return user?.email ?? "사용자";
   }, [user]);
 
+  // ✅ 더미 전구 데이터 (8개 넘기면 페이지 이동 확인 가능)
+  const bulbs: BulbItem[] = [
+    { id: "1", bulbKey: "acorn_yellow" },
+    { id: "2", bulbKey: "dongle_pink" },
+    { id: "3", bulbKey: "soap_blue" },
+    { id: "4", bulbKey: "charlie_green" },
+    { id: "5", bulbKey: "candle_purple" },
+    { id: "6", bulbKey: "acorn_blue" },
+    { id: "7", bulbKey: "dongle_yellow" },
+    { id: "8", bulbKey: "soap_pink" },
+    { id: "9", bulbKey: "admin_bulb" }, // 다음 페이지 첫 슬롯
+  ];
+
   return (
-    <div className="min-h-screen bg-[#D8D1CE]">
-      <div className="mx-auto max-w-[430px] px-5 pt-6 pb-10">
+    <div className="min-h-screen bg-[#D8D1CE] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.6),transparent_45%)]">
+      <div className="mx-auto max-w-[430px] px-5 pt-4 pb-6">
         {/* top bar */}
         <header className="flex items-start justify-between">
           <div className="text-sm font-medium text-neutral-800">
@@ -34,9 +51,9 @@ export default function HomePage() {
           </button>
         </header>
 
-        {/* title section (이미지처럼 좌측 정렬 크게) */}
+        {/* title section */}
         <div className="mt-6">
-          <h1 className="text-4xl font-extrabold tracking-tight text-neutral-900">
+          <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900">
             {displayName} 님의 창문
           </h1>
 
@@ -49,9 +66,23 @@ export default function HomePage() {
         </div>
 
         {/* window area */}
-        <div className="mt-6 overflow-hidden rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.18)]">
-          <div className="aspect-[3/4] w-full bg-black/10">
-            {/* TODO: 실제 창문/전구 UI 컴포넌트 */}
+        <div className="mt-5">
+          <div
+            className="
+              relative w-full overflow-hidden
+              rounded-none shadow-none
+            "
+            style={{
+              // 화면 높이에 맞춰 창문 영역을 자동으로 줄여서 "한 화면"에 들어오게
+              height: "min(62dvh, 720px)",
+            }}
+          >
+            <div className="relative h-full w-full">
+              <Scene
+                bulbs={bulbs}
+                onOpenLetter={(id) => navigate(`/letters/${id}`)}
+              />
+            </div>
           </div>
         </div>
 
