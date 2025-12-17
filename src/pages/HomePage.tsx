@@ -1,32 +1,198 @@
-import { useMemo, useState } from "react";
+import Bulb from "@/components/scene/Bulb";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import SideDrawer from "../components/SideDrawer";
-import { useAuth } from "../contexts/AuthContext";
 
 import Scene from "../components/scene/Scene";
-import type { BulbItem } from "../components/scene/types";
+import SideDrawer from "../components/SideDrawer";
+
+import { SLOTS, PAGE_SIZE } from "../components/scene/sceneSlots";
+import { BULB_IMAGES } from "../components/scene/bulbImages";
+import type { BulbItem, BulbKey } from "../components/scene/types";
+
+import { useAuth } from "../contexts/AuthContext";
+import { getUserLetters } from "../api/letterApi";
+import { isUnlockedByServerDate } from "../utils/time";
+
+
+
+function LockedPopup({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40">
+      <div className="w-[320px] rounded-2xl bg-white p-5 shadow">
+        <div className="text-lg font-semibold">기다려주세요 🎄</div>
+        <div className="mt-2 text-sm text-gray-600">
+          편지는 12/25 00:00에 열려요.
+        </div>
+        <button
+          onClick={onClose}
+          className="mt-4 w-full rounded-xl bg-black px-4 py-2 text-white"
+        >
+          확인
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function toBulbKey(shape: string, color: string): BulbKey | null {
+  if (shape === "admin") return "admin_bulb";
+
+  const key = `${shape}_${color}` as BulbKey;
+
+  const VALID_KEYS: BulbKey[] = [
+    "acorn_yellow",
+    "acorn_purple",
+    "acorn_pink",
+    "acorn_green",
+    "acorn_blue",
+    "dongle_yellow",
+    "dongle_purple",
+    "dongle_pink",
+    "dongle_green",
+    "dongle_blue",
+    "soap_yellow",
+    "soap_purple",
+    "soap_pink",
+    "soap_green",
+    "soap_blue",
+    "charlie_yellow",
+    "charlie_purple",
+    "charlie_pink",
+    "charlie_green",
+    "charlie_blue",
+    "candle_yellow",
+    "candle_purple",
+    "candle_pink",
+    "candle_green",
+    "candle_blue",
+    "admin_bulb",
+  ];
+
+  return VALID_KEYS.includes(key) ? key : null;
+}
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAuthenticated, isLoading } = useAuth();
+
+  // ✅ 문자열 userid 사용 (백엔드가 문자열로 받는다고 했으니)
+  const userid = (user as any)?.userid as string | undefined;
+
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  // 8개 단위 페이지: offset = 0, 8, 16...
+  const [offset, setOffset] = useState(0);
+
+  // 현재 페이지의 전구 0~8개
+  const [bulbs, setBulbs] = useState<BulbItem[]>([]);
+  const [hasNext, setHasNext] = useState(false);
+
+  // 서버 Date 헤더(잠금 판정용)
+  const [serverDate, setServerDate] = useState<Date | null>(null);
+
+  const [loading, setLoading] = useState(false);
+  const [showLockedPopup, setShowLockedPopup] = useState(false);
+
+  const hasPrev = offset > 0;
+
   const displayName = useMemo(() => {
-    return user?.email ?? "사용자";
+    // user에 닉네임이 있으면 우선 사용, 없으면 userid로 대체
+    return (user as any)?.nickname ?? (user as any)?.userid ?? "사용자";
   }, [user]);
 
-  // ✅ 더미 전구 데이터 (8개 넘기면 페이지 이동 확인 가능)
-  const bulbs: BulbItem[] = [
-    { id: "1", bulbKey: "acorn_yellow" },
-    { id: "2", bulbKey: "dongle_pink" },
-    { id: "3", bulbKey: "soap_blue" },
-    { id: "4", bulbKey: "charlie_green" },
-    { id: "5", bulbKey: "candle_purple" },
-    { id: "6", bulbKey: "acorn_blue" },
-    { id: "7", bulbKey: "dongle_yellow" },
-    { id: "8", bulbKey: "soap_pink" },
-    { id: "9", bulbKey: "admin_bulb" }, // 다음 페이지 첫 슬롯
-  ];
+  // 유저가 바뀌면 첫 페이지로
+  useEffect(() => {
+    setOffset(0);
+  }, [userid]);
+
+  // 현재 페이지(8개) 불러오기
+  useEffect(() => {
+    if (isLoading) return;
+    if (!isAuthenticated) return;
+    if (!userid) return;
+
+    let mounted = true;
+
+    (async () => {
+      try {
+        setLoading(true);
+
+        const result = await getUserLetters({
+          userid,
+          limit: PAGE_SIZE,
+          offset,
+        });
+        
+        
+
+        if (!mounted) return;
+
+        const mapped: BulbItem[] = result.items
+          .map((it) => {
+            const bulbKey = toBulbKey(it.ornament_shape, it.ornament_color);
+            
+            if (!bulbKey) return null;
+          
+
+            return {
+              id: String(it.letter_number),
+              bulbKey,
+              nickname: it.writer_nickname ?? "",
+            };
+          })
+          .filter(Boolean) as BulbItem[];
+
+        setBulbs(mapped);
+        setHasNext(result.hasNext);
+        // console.log("bulbs mapped:", mapped);
+
+        if (result.serverDate) setServerDate(result.serverDate);
+      } catch (e) {
+        console.error("getUserLetters failed:", e);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+      
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [isLoading, isAuthenticated, userid, offset]);
+
+  // 서버 시간 기준으로 열림 여부
+  const unlocked = useMemo(() => {
+    if (!serverDate) return false;
+    return isUnlockedByServerDate(serverDate);
+
+
+  }, [serverDate]);
+  
+
+  // 페이지 표시는 총 개수 없으니 최소 추정 (hasNext면 +1)
+  const pageIndex = Math.floor(offset / PAGE_SIZE) + 1;
+  const pageCount = useMemo(
+    () => (hasNext ? pageIndex + 1 : pageIndex),
+    [hasNext, pageIndex]
+  );
+
+  const onPrev = () => {
+    if (!hasPrev || loading) return;
+    setOffset((v) => Math.max(0, v - PAGE_SIZE));
+  };
+
+  const onNext = () => {
+    if (!hasNext || loading) return;
+    setOffset((v) => v + PAGE_SIZE);
+  };
+
+  const onOpenLetter = (id: string) => {
+    if (!unlocked) {
+      setShowLockedPopup(true);
+      return;
+    }
+    navigate(`/letters/${id}`);
+  };
 
   return (
     <div className="min-h-screen bg-[#D8D1CE] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.6),transparent_45%)]">
@@ -68,20 +234,69 @@ export default function HomePage() {
         {/* window area */}
         <div className="mt-5">
           <div
-            className="
-              relative w-full overflow-hidden
-              rounded-none shadow-none
-            "
+            className="relative w-full overflow-hidden rounded-none shadow-none"
             style={{
-              // 화면 높이에 맞춰 창문 영역을 자동으로 줄여서 "한 화면"에 들어오게
               height: "min(62dvh, 720px)",
             }}
           >
             <div className="relative h-full w-full">
-              <Scene
-                bulbs={bulbs}
-                onOpenLetter={(id) => navigate(`/letters/${id}`)}
-              />
+              <Scene>
+                {SLOTS.map((pos, i) => {
+                  const bulb = bulbs[i];
+                  if (!bulb) return null;
+
+                  const src = BULB_IMAGES[bulb.bulbKey];
+                  if (!src) return null;
+
+                  return (
+                    <Bulb
+                      key={bulb.id}
+                      left={pos.left}
+                      top={pos.top}
+                      src={src}
+                      nickname={bulb.nickname}
+                      onClick={() => onOpenLetter(bulb.id)}
+                    />
+                  );
+                })}
+
+          
+
+                {/* arrows */}
+                {hasPrev && (
+                  <button
+                    type="button"
+                    disabled={loading}
+                    onClick={onPrev}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 z-[10] px-2 py-2 rounded bg-white/70 disabled:opacity-30"
+                  >
+                    ◀
+                  </button>
+                )}
+
+                {hasNext && (
+                  <button
+                    type="button"
+                    disabled={loading}
+                    onClick={onNext}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 z-[10] px-2 py-2 rounded bg-white/70 disabled:opacity-30"
+                  >
+                    ▶
+                  </button>
+                )}
+
+                {/* page indicator */}
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-[10] text-sm bg-white/70 px-3 py-1 rounded">
+                  {pageIndex} / {pageCount}
+                </div>
+
+                {/* loading overlay */}
+                {loading && (
+                  <div className="absolute inset-0 z-[20] grid place-items-center text-sm text-gray-700 bg-white/20">
+                    불러오는 중...
+                  </div>
+                )}
+              </Scene>
             </div>
           </div>
         </div>
@@ -96,6 +311,8 @@ export default function HomePage() {
       </div>
 
       <SideDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
+
+      {showLockedPopup && <LockedPopup onClose={() => setShowLockedPopup(false)} />}
     </div>
   );
 }

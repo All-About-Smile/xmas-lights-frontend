@@ -9,4 +9,5 @@ export type BulbKey =
 export type BulbItem = {
   id: string;     // letterId
   bulbKey: BulbKey;
+  nickname: string;
 };
