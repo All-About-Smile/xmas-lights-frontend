@@ -1,3 +1,4 @@
+import Bulb from "@/components/scene/Bulb";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -11,6 +12,8 @@ import type { BulbItem, BulbKey } from "../components/scene/types";
 import { useAuth } from "../contexts/AuthContext";
 import { getUserLetters } from "../api/letterApi";
 import { isUnlockedByServerDate } from "../utils/time";
+
+
 
 function LockedPopup({ onClose }: { onClose: () => void }) {
   return (
@@ -127,17 +130,21 @@ export default function HomePage() {
         const mapped: BulbItem[] = result.items
           .map((it) => {
             const bulbKey = toBulbKey(it.ornament_shape, it.ornament_color);
+            
             if (!bulbKey) return null;
+          
 
             return {
               id: String(it.letter_number),
               bulbKey,
+              nickname: it.writer_nickname ?? "",
             };
           })
           .filter(Boolean) as BulbItem[];
 
         setBulbs(mapped);
         setHasNext(result.hasNext);
+        // console.log("bulbs mapped:", mapped);
 
         if (result.serverDate) setServerDate(result.serverDate);
       } catch (e) {
@@ -234,36 +241,26 @@ export default function HomePage() {
           >
             <div className="relative h-full w-full">
               <Scene>
-                {/* bulbs layer */}
-                <div className="absolute inset-0 z-[6]">
-                  {SLOTS.map((pos, i) => {
-                    const bulb = bulbs[i];
-                    if (!bulb) return null;
+                {SLOTS.map((pos, i) => {
+                  const bulb = bulbs[i];
+                  if (!bulb) return null;
 
-                    const src = BULB_IMAGES[bulb.bulbKey];
-                    if (!src) return null;
+                  const src = BULB_IMAGES[bulb.bulbKey];
+                  if (!src) return null;
 
-                    return (
-                      <button
-                        key={bulb.id}
-                        type="button"
-                        onClick={() => onOpenLetter(bulb.id)}
-                        className="absolute -translate-x-1/2"
-                        style={{ left: pos.left, top: pos.top }}
-                      >
-                        <img
-                          src={src}
-                          alt=""
-                          className="w-10 h-auto translate-y-1"
-                          style={{
-                            transform: "scale(3)",
-                            transformOrigin: "top center",
-                          }}
-                        />
-                      </button>
-                    );
-                  })}
-                </div>
+                  return (
+                    <Bulb
+                      key={bulb.id}
+                      left={pos.left}
+                      top={pos.top}
+                      src={src}
+                      nickname={bulb.nickname}
+                      onClick={() => onOpenLetter(bulb.id)}
+                    />
+                  );
+                })}
+
+          
 
                 {/* arrows */}
                 {hasPrev && (

@@ -7,12 +7,13 @@ import windowFrame from "@/assets/scene/window_frame_cropped.png";
 import bulbString from "@/assets/scene/bulb_string_cropped.png";
 
 type Props = {
-  children?: ReactNode; // ✅ 전구/버튼 레이어는 밖에서 주입
+  children?: ReactNode;
 };
 
 export default function Scene({ children }: Props) {
   return (
-    <div className="relative w-full h-full overflow-hidden">
+    // ✅ overflow-visible 로 변경
+    <div className="relative w-full h-full overflow-visible">
       {/* 1) window (보드판) */}
       <img
         src={windowBoard}
@@ -61,8 +62,10 @@ export default function Scene({ children }: Props) {
         style={{ transform: "scale(1.05)", transformOrigin: "center" }}
       />
 
-      {/* ✅ 6) Overlay Layer (bulbs / arrows / UI 등 올리는 자리) */}
-      <div className="absolute inset-0 z-[6]">{children}</div>
+      {/* ✅ 6) Overlay Layer (전구/화살표/UI) */}
+      <div className="absolute inset-0 z-[6] overflow-visible">
+        {children}
+      </div>
     </div>
   );
 }
