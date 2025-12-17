@@ -119,6 +119,8 @@ export default function HomePage() {
           limit: PAGE_SIZE,
           offset,
         });
+        
+        
 
         if (!mounted) return;
 
@@ -143,6 +145,7 @@ export default function HomePage() {
       } finally {
         if (mounted) setLoading(false);
       }
+      
     })();
 
     return () => {
@@ -154,7 +157,10 @@ export default function HomePage() {
   const unlocked = useMemo(() => {
     if (!serverDate) return false;
     return isUnlockedByServerDate(serverDate);
+
+
   }, [serverDate]);
+  
 
   // 페이지 표시는 총 개수 없으니 최소 추정 (hasNext면 +1)
   const pageIndex = Math.floor(offset / PAGE_SIZE) + 1;

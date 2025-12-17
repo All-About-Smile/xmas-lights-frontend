@@ -26,6 +26,7 @@ export async function getUserLetters(params: {
     params: { limit, offset },
   });
 
+
   const dateHeader = res.headers?.date as string | undefined;
   const serverDate = dateHeader ? new Date(dateHeader) : null;
 
