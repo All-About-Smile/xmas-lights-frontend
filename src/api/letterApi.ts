@@ -9,6 +9,21 @@ export type LetterItem = {
   created_at: string;
 };
 
+export type CreateLetterBody = {
+  writer_nickname: string;
+  content: string;
+  ornament_shape: string;   // 예: "acorn"
+  ornament_color: string;   // 예: "yellow"
+  password_for_edit: string;
+
+};
+
+export async function createUserLetter(userid: string, body: CreateLetterBody) {
+  const { data } = await apiClient.post(`/users/${userid}/letters`, body);
+  return data;
+}
+
+
 export async function getUserLetters(params: {
   userid: string;
   limit: number;
