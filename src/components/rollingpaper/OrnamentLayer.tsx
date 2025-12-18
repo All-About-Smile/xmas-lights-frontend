@@ -78,7 +78,7 @@ export default function OrnamentLayer({
       )}
 
       {/* page indicator */}
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-[10] text-sm bg-white/70 px-3 py-1 rounded">
+      <div className="absolute bottom-0.5 left-1/2 -translate-x-1/2 z-[10] text-sm bg-white/70 px-3 py-1 rounded">
         {pageIndex} / {pageCount}
       </div>
 

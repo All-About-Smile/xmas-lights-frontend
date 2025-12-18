@@ -7,16 +7,16 @@ export const PAGE_SIZE = 8;
  */
 export const SLOTS = [
   // row 1 (3) : 1번째 전선(상단)
-  { left: "28%", top: "31%" },
-  { left: "50%", top: "28%" },
-  { left: "72%", top: "24%" },
+  { left: "28%", top: "32.5%" },
+  { left: "50%", top: "32%" },
+  { left: "72%", top: "27%" },
 
   // row 2 (2) : 2번째 전선(중단)
-  { left: "36%", top: "54%" },
-  { left: "62%", top: "48%" },
+  { left: "36%", top: "58%" },
+  { left: "62%", top: "54.5%" },
 
   // row 3 (3) : 3번째 전선(하단)
-  { left: "26%", top: "80%" },
-  { left: "50%", top: "78%" },
-  { left: "74%", top: "74%" },
+  { left: "26%", top: "82%" },
+  { left: "50%", top: "81%" },
+  { left: "74%", top: "76%" },
 ] as const;

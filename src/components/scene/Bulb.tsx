@@ -6,8 +6,8 @@ type BulbProps = {
   onClick: () => void;
 };
 
-const BULB_SCALE = 2; //전구 크기
-const LABEL_OFFSET_PX = 60; //전구 닉네임 라벨 위치 조정
+const BULB_SCALE = 2.2; //전구 크기
+const LABEL_OFFSET_PX = 56; //전구 닉네임 라벨 위치 조정
 
 export default function Bulb({
   left,
