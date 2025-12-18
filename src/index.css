@@ -67,6 +67,13 @@
     -moz-osx-font-smoothing: grayscale;
     overscroll-behavior-y: none;
     -webkit-tap-highlight-color: transparent;
+    overflow: hidden;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
   }
 
   a {
