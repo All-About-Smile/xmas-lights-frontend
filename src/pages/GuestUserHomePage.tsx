@@ -104,8 +104,8 @@ export default function GuestUserHomePage() {
   };
 
   return (
-    <div className="min-h-screen select-none caret-transparent bg-[#D8D1CE] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.6),transparent_45%)]">
-      <div className="mx-auto max-w-[430px] px-5 pt-4 pb-6">
+    <div className="h-[100dvh] overflow-hidden select-none caret-transparent bg-[#D8D1CE] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.6),transparent_45%)]">
+      <div className="mx-auto max-w-[430px] h-full px-5 pt-4 pb-4 flex flex-col">
         {/* top bar */}
         <header className="flex items-start justify-between">
           <div className="text-sm font-medium text-neutral-800">밝혀줘! 내 X-mas 전구</div>
@@ -122,7 +122,7 @@ export default function GuestUserHomePage() {
         </header>
 
         {/* title section */}
-        <div className="mt-6">
+        <div className="mt-4">
           <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900">
             {displayName} 님의 창문
           </h1>
@@ -132,8 +132,8 @@ export default function GuestUserHomePage() {
         </div>
 
         {/* window area */}
-        <div className="mt-5">
-          <div className="relative w-full overflow-hidden rounded-none shadow-none aspect-[430/535]">
+        <div className="mt-4 flex-1 min-h-0 flex items-center justify-center">
+          <div className="relative h-[min(54dvh,480px)] w-auto max-w-full overflow-hidden rounded-none shadow-none aspect-[430/535]">
             <div className="relative h-full w-full">
               <Scene>
                 <OrnamentLayer
@@ -155,7 +155,7 @@ export default function GuestUserHomePage() {
         </div>
 
         {/* bottom buttons */}
-        <div className="mt-8 space-y-3">
+        <div className="mt-4 space-y-3">
           {/* ✅ 요구사항: 창문 꾸미기 버튼을 누르면 편지 작성 */}
           <button
             type="button"
