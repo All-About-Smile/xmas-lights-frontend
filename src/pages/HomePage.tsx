@@ -1,3 +1,4 @@
+import { toBulbKey } from "@/utils/bulbKey";
 import OrnamentLayer from "@/components/rollingpaper/OrnamentLayer";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -7,7 +8,7 @@ import SideDrawer from "../components/SideDrawer";
 
 import { SLOTS, PAGE_SIZE } from "../components/scene/sceneSlots";
 import { BULB_IMAGES } from "../components/scene/bulbImages";
-import type { BulbItem, BulbKey } from "../components/scene/types";
+import type { BulbItem } from "../components/scene/types";
 
 import { useAuth } from "../contexts/AuthContext";
 import { getUserLetters } from "../api/letterApi";
@@ -34,42 +35,6 @@ function LockedPopup({ onClose }: { onClose: () => void }) {
   );
 }
 
-function toBulbKey(shape: string, color: string): BulbKey | null {
-  if (shape === "admin") return "admin_bulb";
-
-  const key = `${shape}_${color}` as BulbKey;
-
-  const VALID_KEYS: BulbKey[] = [
-    "acorn_yellow",
-    "acorn_purple",
-    "acorn_pink",
-    "acorn_green",
-    "acorn_blue",
-    "dongle_yellow",
-    "dongle_purple",
-    "dongle_pink",
-    "dongle_green",
-    "dongle_blue",
-    "soap_yellow",
-    "soap_purple",
-    "soap_pink",
-    "soap_green",
-    "soap_blue",
-    "charlie_yellow",
-    "charlie_purple",
-    "charlie_pink",
-    "charlie_green",
-    "charlie_blue",
-    "candle_yellow",
-    "candle_purple",
-    "candle_pink",
-    "candle_green",
-    "candle_blue",
-    "admin_bulb",
-  ];
-
-  return VALID_KEYS.includes(key) ? key : null;
-}
 
 export default function HomePage() {
   const navigate = useNavigate();

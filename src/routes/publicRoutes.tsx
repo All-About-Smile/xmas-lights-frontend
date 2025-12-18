@@ -5,6 +5,8 @@ import LandingPage from "../pages/LandingPage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import FindAccountPage from "../pages/FindAccountPage";
+import GuestUserHomePage from "@/pages/GuestUserHomePage";
+import WriteLetterPage from "@/pages/WriteLetterPage";
 
 export function publicRoutes(isAuthenticated: boolean): RouteObject[] {
   return [
@@ -24,9 +26,13 @@ export function publicRoutes(isAuthenticated: boolean): RouteObject[] {
       path: "/account/find",
       element: <FindAccountPage />,
     },
-
-    // 🔓 공유 링크 (Public) - 페이지 만들면 주석 해제
-    // { path: "/share/:code", element: <ShareLandingPage /> },
-    // { path: "/share/:code/write", element: <ShareWriteLetterPage /> },
+    { 
+      path: "/users/:userid", 
+      element: <GuestUserHomePage /> 
+    },
+    { 
+      path: "/users/:userid/letters",
+       element: <WriteLetterPage /> 
+    },
   ];
 }
