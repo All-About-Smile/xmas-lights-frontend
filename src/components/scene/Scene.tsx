@@ -18,6 +18,7 @@ export default function Scene({ children }: Props) {
       <img
         src={windowBoard}
         alt=""
+        draggable={false}
         className="absolute inset-0 w-full h-full object-contain z-[1] pointer-events-none"
       />
 
@@ -38,11 +39,13 @@ export default function Scene({ children }: Props) {
         <img
           src={backgroundBase}
           alt=""
+          draggable={false}
           className="absolute inset-0 w-full h-full object-contain pointer-events-none"
         />
         <img
           src={backgroundSnow}
           alt=""
+          draggable={false}
           className="absolute inset-0 w-full h-full object-contain pointer-events-none"
         />
       </div>
@@ -51,6 +54,7 @@ export default function Scene({ children }: Props) {
       <img
         src={windowFrame}
         alt=""
+        draggable={false}
         className="absolute inset-0 w-full h-full object-contain z-[4] pointer-events-none"
       />
 
@@ -58,6 +62,7 @@ export default function Scene({ children }: Props) {
       <img
         src={bulbString}
         alt=""
+        draggable={false}
         className="absolute inset-0 w-full h-full object-contain z-[5] pointer-events-none"
         style={{ transform: "scale(1.05)", transformOrigin: "center" }}
       />

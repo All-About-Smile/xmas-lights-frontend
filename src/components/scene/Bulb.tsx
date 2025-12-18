@@ -29,6 +29,7 @@ export default function Bulb({
         <img
           src={src}
           alt=""
+          draggable={false}
           className="block w-10 h-auto"
           style={{
             transform: `scale(${BULB_SCALE})`,
