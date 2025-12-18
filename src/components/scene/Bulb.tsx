@@ -6,9 +6,8 @@ type BulbProps = {
   onClick: () => void;
 };
 
-const BULB_SCALE = 2.2; //전구 크기
-const LABEL_OFFSET_PX = 56; //전구 닉네임 라벨 위치 조정
-
+const BULB_WIDTH = "min(18%, 88px)";
+const LABEL_GAP_PX = 2;
 export default function Bulb({
   left,
   top,
@@ -23,18 +22,15 @@ export default function Bulb({
         left,
         top,
         transform: "translate(-50%, -50%)",
+        width: BULB_WIDTH,
       }}
     >
-      <button type="button" onClick={onClick} className="relative block">
+      <button type="button" onClick={onClick} className="relative block w-full">
         <img
           src={src}
           alt=""
           draggable={false}
-          className="block w-10 h-auto"
-          style={{
-            transform: `scale(${BULB_SCALE})`,
-            transformOrigin: "top center",
-          }}
+          className="block w-full h-auto"
         />
       </button>
 
@@ -46,7 +42,7 @@ export default function Bulb({
           text-[11px] font-semibold text-neutral-900
           shadow pointer-events-none
         "
-        style={{ top: LABEL_OFFSET_PX }}
+        style={{ top: `calc(100% + ${LABEL_GAP_PX}px)` }}
         title={nickname}
       >
         {nickname}
@@ -54,3 +50,4 @@ export default function Bulb({
     </div>
   );
 }
+
