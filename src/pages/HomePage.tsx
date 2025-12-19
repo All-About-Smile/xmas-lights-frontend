@@ -1,17 +1,14 @@
-import { toBulbKey } from "@/utils/bulbKey";
 import OrnamentLayer from "@/components/rollingpaper/OrnamentLayer";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Scene from "../components/scene/Scene";
 import SideDrawer from "../components/SideDrawer";
-
-import { SLOTS, PAGE_SIZE } from "../components/scene/sceneSlots";
+import { SLOTS } from "../components/scene/sceneSlots";
 import { BULB_IMAGES } from "../components/scene/bulbImages";
-import type { BulbItem } from "../components/scene/types";
 
+import { useLetterPagination } from "@/hooks/useLetterPagination";
 import { useAuth } from "../contexts/AuthContext";
-import { getUserLetters } from "../api/letterApi";
 import { isUnlockedByServerDate } from "../utils/time";
 
 
@@ -40,115 +37,44 @@ export default function HomePage() {
   const navigate = useNavigate();
   const { user, isAuthenticated, isLoading } = useAuth();
 
-  // ✅ 문자열 userid 사용 (백엔드가 문자열로 받는다고 했으니)
+  // userid is string on the API shape
   const userid = (user as any)?.userid as string | undefined;
 
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  // 8개 단위 페이지: offset = 0, 8, 16...
-  const [offset, setOffset] = useState(0);
-
-  // 현재 페이지의 전구 0~8개
-  const [bulbs, setBulbs] = useState<BulbItem[]>([]);
-  const [hasNext, setHasNext] = useState(false);
-
-  // 서버 Date 헤더(잠금 판정용)
-  const [serverDate, setServerDate] = useState<Date | null>(null);
-
-  const [loading, setLoading] = useState(false);
   const [showLockedPopup, setShowLockedPopup] = useState(false);
 
-  const hasPrev = offset > 0;
+  const {
+    bulbs,
+    hasPrev,
+    hasNext,
+    pageIndex,
+    pageCount,
+    loading,
+    serverDate,
+    goPrev,
+    goNext,
+  } = useLetterPagination({
+    userid,
+    enabled: isAuthenticated && !isLoading,
+  });
 
   const displayName = useMemo(() => {
     // user에 닉네임이 있으면 우선 사용, 없으면 userid로 대체
     return (user as any)?.nickname ?? (user as any)?.userid ?? "사용자";
   }, [user]);
 
-  // 유저가 바뀌면 첫 페이지로
-  useEffect(() => {
-    setOffset(0);
-  }, [userid]);
-
-  // 현재 페이지(8개) 불러오기
-  useEffect(() => {
-    if (isLoading) return;
-    if (!isAuthenticated) return;
-    if (!userid) return;
-
-    let mounted = true;
-
-    (async () => {
-      try {
-        setLoading(true);
-
-        const result = await getUserLetters({
-          userid,
-          limit: PAGE_SIZE,
-          offset,
-        });
-        
-        
-
-        if (!mounted) return;
-
-        const mapped: BulbItem[] = result.items
-          .map((it) => {
-            const bulbKey = toBulbKey(it.ornament_shape, it.ornament_color);
-            
-            if (!bulbKey) return null;
-          
-
-            return {
-              id: String(it.letter_number),
-              bulbKey,
-              nickname: it.writer_nickname ?? "",
-            };
-          })
-          .filter(Boolean) as BulbItem[];
-
-        setBulbs(mapped);
-        setHasNext(result.hasNext);
-        // console.log("bulbs mapped:", mapped);
-
-        if (result.serverDate) setServerDate(result.serverDate);
-      } catch (e) {
-        console.error("getUserLetters failed:", e);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-      
-    })();
-
-    return () => {
-      mounted = false;
-    };
-  }, [isLoading, isAuthenticated, userid, offset]);
-
   // 서버 시간 기준으로 열림 여부
   const unlocked = useMemo(() => {
     if (!serverDate) return false;
     return isUnlockedByServerDate(serverDate);
-
-
   }, [serverDate]);
-  
-
-  // 페이지 표시는 총 개수 없으니 최소 추정 (hasNext면 +1)
-  const pageIndex = Math.floor(offset / PAGE_SIZE) + 1;
-  const pageCount = useMemo(
-    () => (hasNext ? pageIndex + 1 : pageIndex),
-    [hasNext, pageIndex]
-  );
 
   const onPrev = () => {
-    if (!hasPrev || loading) return;
-    setOffset((v) => Math.max(0, v - PAGE_SIZE));
+    goPrev();
   };
 
   const onNext = () => {
-    if (!hasNext || loading) return;
-    setOffset((v) => v + PAGE_SIZE);
+    goNext();
   };
 
   const onOpenLetter = (id: string) => {

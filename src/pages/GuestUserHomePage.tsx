@@ -1,100 +1,151 @@
 import OrnamentLayer from "@/components/rollingpaper/OrnamentLayer";
 import Scene from "@/components/scene/Scene";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { SLOTS, PAGE_SIZE } from "@/components/scene/sceneSlots";
+import { SLOTS } from "@/components/scene/sceneSlots";
 import { BULB_IMAGES } from "@/components/scene/bulbImages";
-import type { BulbItem } from "@/components/scene/types";
 
-import { getUserLetters } from "@/api/letterApi";
-import { toBulbKey } from "@/utils/bulbKey";
+import { useLetterPagination } from "@/hooks/useLetterPagination";
+
+function ActionModal({
+  open,
+  onClose,
+  onEdit,
+  onDelete,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/40">
+      <div className="w-[360px] max-w-[90vw] rounded-2xl bg-[#F3EEDB] p-6 shadow-xl relative">
+        <button onClick={onClose} className="absolute right-3 top-3 text-neutral-700">
+          ×
+        </button>
+
+        <div className="text-base font-extrabold text-neutral-900 text-center">
+          메시지를 변경하시겠습니까?
+        </div>
+
+        <div className="mt-6 flex justify-center gap-3">
+          <button
+            type="button"
+            onClick={onEdit}
+            className="h-10 w-24 rounded bg-neutral-800 text-white text-sm font-semibold"
+          >
+            수정
+          </button>
+          <button
+            type="button"
+            onClick={onDelete}
+            className="h-10 w-24 rounded bg-red-600 text-white text-sm font-semibold"
+          >
+            삭제
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PasswordModal({
+  open,
+  title,
+  onClose,
+  onConfirm,
+  errorMsg,
+}: {
+  open: boolean;
+  title: string;
+  onClose: () => void;
+  onConfirm: (pw: string) => void;
+  errorMsg?: string | null;
+}) {
+  const [pw, setPw] = useState("");
+
+  useEffect(() => {
+    if (open) setPw("");
+  }, [open]);
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40">
+      <div className="w-[380px] max-w-[92vw] rounded-2xl bg-[#F3EEDB] p-6 shadow-xl relative">
+        <button onClick={onClose} className="absolute right-3 top-3 text-neutral-700">
+          ×
+        </button>
+
+        <div className="text-base font-extrabold text-neutral-900 text-center">{title}</div>
+
+        <div className="mt-5 flex items-center gap-3">
+          <input
+            className="flex-1 rounded-lg bg-white px-4 py-3 text-center tracking-widest outline-none ring-1 ring-red-300 focus:ring-2 focus:ring-[#8E2F2F]"
+            placeholder="비밀번호 입력"
+            inputMode="numeric"
+            value={pw}
+            onChange={(e) => setPw(e.target.value.replace(/\D/g, "").slice(0, 4))}
+          />
+          <button
+            type="button"
+            disabled={pw.length !== 4}
+            onClick={() => onConfirm(pw)}
+            className="h-11 w-16 rounded bg-neutral-200 text-sm font-semibold disabled:opacity-40"
+          >
+            확인
+          </button>
+        </div>
+
+        {errorMsg && <div className="mt-2 text-xs text-red-600 text-center">{errorMsg}</div>}
+      </div>
+    </div>
+  );
+}
+
 
 
 export default function GuestUserHomePage() {
+  type ActionType = "edit" | "delete";
+
+  const [openActionModal, setOpenActionModal] = useState(false);
+  const [openPwModal, setOpenPwModal] = useState(false);
+  const [selectedLetterNumber, setSelectedLetterNumber] = useState<string | null>(null);
+  const [selectedAction, setSelectedAction] = useState<ActionType | null>(null);
+  const [pwError, setPwError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { userid } = useParams<{ userid: string }>();
 
-  // 8개 단위 페이지: offset = 0, 8, 16...
-  const [offset, setOffset] = useState(0);
-
-  // 현재 페이지의 전구 0~8개
-  const [bulbs, setBulbs] = useState<BulbItem[]>([]);
-  const [hasNext, setHasNext] = useState(false);
-
-  const [loading, setLoading] = useState(false);
-
-  const hasPrev = offset > 0;
-
-  // userid 바뀌면 첫 페이지로
-  useEffect(() => {
-    setOffset(0);
-  }, [userid]);
-
-  // 현재 페이지(8개) 불러오기
-    useEffect(() => {
-    if (!userid) return;
-
-    let mounted = true;
-
-    (async () => {
-        try {
-        setLoading(true);
-
-        const result = await getUserLetters({
-            userid,
-            limit: PAGE_SIZE,
-            offset,
-        });
-
-        if (!mounted) return;
-
-        const mapped: BulbItem[] = result.items
-            .map((it) => {
-            const bulbKey = toBulbKey(it.ornament_shape, it.ornament_color);
-            if (!bulbKey) return null;
-
-            return {
-                id: String(it.letter_number),
-                bulbKey,
-                nickname: it.writer_nickname ?? "",
-            };
-            })
-            .filter(Boolean) as BulbItem[];
-
-        setBulbs(mapped);
-        setHasNext(result.hasNext);
-        } catch (e) {
-        console.error("getUserLetters failed:", e);
-        } finally {
-        if (mounted) setLoading(false);
-        }
-    })();
-
-    return () => {
-        mounted = false;
-    };
-    }, [userid, offset]);
-
-
-  // 페이지 표시(총 개수 없으니 최소 추정)
-  const pageIndex = Math.floor(offset / PAGE_SIZE) + 1;
-  const pageCount = useMemo(() => (hasNext ? pageIndex + 1 : pageIndex), [hasNext, pageIndex]);
+  const {
+    bulbs,
+    hasPrev,
+    hasNext,
+    pageIndex,
+    pageCount,
+    loading,
+    goPrev,
+    goNext,
+    reset,
+    refresh,
+  } = useLetterPagination({ userid });
 
   const onPrev = () => {
-    if (!hasPrev || loading) return;
-    setOffset((v) => Math.max(0, v - PAGE_SIZE));
+    goPrev();
   };
 
   const onNext = () => {
-    if (!hasNext || loading) return;
-    setOffset((v) => v + PAGE_SIZE);
+    goNext();
   };
 
-  const onOpenLetter = () => {
-    return;
-  };
+  const onOpenLetter = (letterNumber: string) => {
+    setSelectedLetterNumber(letterNumber);
+    setOpenActionModal(true);
+};  
 
   const displayName = userid ?? "사용자";
 
@@ -102,6 +153,7 @@ export default function GuestUserHomePage() {
     if (!userid) return;
     navigate(`/users/${userid}/letters`);
   };
+  
 
   return (
     <div className="min-h-screen bg-[#D8D1CE] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.6),transparent_45%)]">
@@ -169,6 +221,55 @@ export default function GuestUserHomePage() {
           </button>
         </div>
       </div>
+      <ActionModal
+        open={openActionModal}
+        onClose={() => setOpenActionModal(false)}
+        onEdit={() => {
+            setSelectedAction("edit");
+            setOpenActionModal(false);
+            setPwError(null);
+            setOpenPwModal(true);
+        }}
+        onDelete={() => {
+            setSelectedAction("delete");
+            setOpenActionModal(false);
+            setPwError(null);
+            setOpenPwModal(true);
+        }}
+        />
+
+        <PasswordModal
+        open={openPwModal}
+        title={selectedAction === "delete" ? "메시지를 삭제하시겠습니까?" : "메시지를 수정하시겠습니까?"}
+        errorMsg={pwError}
+        onClose={() => setOpenPwModal(false)}
+        onConfirm={async (pw) => {
+            if (!userid || !selectedLetterNumber || !selectedAction) return;
+
+            // ✅ 여기서 비밀번호 검증을 “서버에 맡기는 방식”이 제일 안전
+            // edit: 수정 페이지로 이동 (비번은 state로 넘김)
+            if (selectedAction === "edit") {
+            setOpenPwModal(false);
+            navigate(`/users/${userid}/letters/${selectedLetterNumber}/edit`, {
+                state: { password: pw },
+            });
+            return;
+            }
+
+            // delete: 삭제 API 호출 (엔드포인트는 너희 BE에 맞춰 바꿔야 함)
+            try {
+            // await deleteLetter(userid, selectedLetterNumber, pw);
+            setOpenPwModal(false);
+            // 삭제 후 목록 새로고침
+            reset();
+            await refresh();
+            } catch (e) {
+            setPwError("비밀번호가 일치하지 않습니다");
+            }
+        }}
+        />
     </div>
+    
   );
+  
 }

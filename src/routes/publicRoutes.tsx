@@ -34,5 +34,14 @@ export function publicRoutes(isAuthenticated: boolean): RouteObject[] {
       path: "/users/:userid/letters",
        element: <WriteLetterPage /> 
     },
+    { 
+      path: "/users/:userid/letters/:letterNumber/edit", 
+      element: <WriteLetterPage /> 
+    },
+    // { 
+    //   path: "/users/:userid/letters/:letterNumber/edit", 
+    //   element: <EditLetterPage /> 
+    // },
+
   ];
 }
