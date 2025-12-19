@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import InfoButton from "../components/InfoButton";
 /**
  * 랜딩(처음) 화면:
  * - 오른쪽 위 i 버튼: hover(데스크탑) + 클릭(모바일) 모두 지원
@@ -31,13 +32,7 @@ export default function LandingPage() {
 
           {/* info button */}
           <div className="relative">
-            <button
-              aria-label="사용법 안내"
-              {...helpHandlers}
-              className="grid h-9 w-9 place-items-center rounded-full border-2 border-neutral-900 text-lg font-bold"
-            >
-              i
-            </button>
+            <InfoButton ariaLabel="사용법 안내" {...helpHandlers} />
 
             {/* popover */}
             <div
