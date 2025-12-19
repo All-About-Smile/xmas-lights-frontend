@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import Scene from "../components/scene/Scene";
 import SideDrawer from "../components/SideDrawer";
+import MenuButton from "@/components/navigation/MenuButton";
 
 import { SLOTS, PAGE_SIZE } from "../components/scene/sceneSlots";
 import { BULB_IMAGES } from "../components/scene/bulbImages";
@@ -169,18 +170,7 @@ export default function HomePage() {
           </div>
 
           {/* hamburger */}
-          <button
-            onClick={() => setDrawerOpen(true)}
-            className="p-2"
-            aria-label="메뉴 열기"
-          >
-            <img
-              src="/Menu.png"
-              alt=""
-              draggable={false}
-              className="h-7 w-7"
-            />
-          </button>
+          <MenuButton onClick={() => setDrawerOpen(true)} ariaLabel="메뉴 열기" />
         </header>
 
         {/* title section */}

@@ -1,5 +1,6 @@
 import OrnamentLayer from "@/components/rollingpaper/OrnamentLayer";
 import Scene from "@/components/scene/Scene";
+import HomeButton from "@/components/navigation/HomeButton";
 
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -111,19 +112,7 @@ export default function GuestUserHomePage() {
           <div className="text-sm font-medium text-neutral-800">밝혀줘! 내 X-mas 전구</div>
 
           {/* ✅ 햄버거 대신 홈 버튼: LandingPage로 */}
-          <button
-            type="button"
-            onClick={() => navigate("/")}
-            className="p-2"
-            aria-label="메인으로"
-          >
-            <img
-              src="/Home.png"
-              alt=""
-              draggable={false}
-              className="h-7 w-7"
-            />
-          </button>
+          <HomeButton onClick={() => navigate("/")} ariaLabel="��������" />
         </header>
 
         {/* title section */}
