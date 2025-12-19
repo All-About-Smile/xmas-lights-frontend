@@ -3,6 +3,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import LetterSheet from "@/components/letter/LetterSheet";
 import LoadingText from "@/components/common/LoadingText";
+import BackButton from "@/components/common/BackButton";
 import { BULB_IMAGES } from "@/components/scene/bulbImages";
 import { toBulbKey } from "@/utils/bulbKey";
 
@@ -71,10 +72,10 @@ function ConfirmSaveModal({
         className="w-[360px] max-w-[90vw] rounded-2xl bg-white p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="text-lg font-extrabold text-neutral-900">
+        <div className="text-2xl font-extrabold text-neutral-900">
           전구를 밝혀주시겠어요?
         </div>
-        <div className="mt-2 text-sm text-neutral-700">
+        <div className="mt-2 text-lg text-neutral-700">
           메시지를 최종 확인해주세요!
         </div>
 
@@ -82,7 +83,7 @@ function ConfirmSaveModal({
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-xl bg-[#C9C3C3] px-4 py-2 text-sm font-semibold text-neutral-900 shadow"
+            className="rounded-xl bg-[#C9C3C3] px-4 py-2 text-xl font-semibold text-neutral-900 shadow"
           >
             잠시만요!
           </button>
@@ -91,7 +92,7 @@ function ConfirmSaveModal({
             type="button"
             onClick={onConfirm}
             disabled={disabled}
-            className="rounded-xl bg-[#4B6B12] px-4 py-2 text-sm font-semibold text-white shadow disabled:opacity-40"
+            className="rounded-xl bg-[#4B6B12] px-4 py-2 text-xl font-semibold text-white shadow disabled:opacity-40"
           >
             네~
           </button>
@@ -267,23 +268,18 @@ export default function WriteLetterPage() {
       <div className="min-h-screen bg-[#D8D1CE]">
         <div className="mx-auto max-w-[var(--layout-max-width)] px-[var(--layout-side-padding)] pt-4 pb-10">
           <header className="flex items-start justify-between">
-            <button
-              type="button"
-              onClick={onBack}
-              className="text-sm font-medium text-neutral-900"
-            >
-              ← 이전
-            </button>
+            <BackButton onClick={onBack} className="text-base font-medium text-neutral-900" />
             <div />
           </header>
 
-          <h1 className="mt-6 text-xl font-extrabold text-neutral-900">
+          <h1 className="mt-6 text-2xl font-extrabold text-neutral-900">
             전구를 선택해주세요
           </h1>
 
           {/* 모양 */}
-          <div className="mt-5 rounded-2xl border border-neutral-700/40 bg-transparent px-4 py-4">
-            <div className="flex items-center justify-between gap-2">
+          <div className="mt-6">
+            <div className="text-base font-semibold text-neutral-800">모양 선택</div>
+            <div className="mt-3 flex w-full justify-between rounded-2xl border border-neutral-700/40 bg-transparent px-6 py-4">
               {ORNAMENT_OPTIONS.map((opt) => {
                 const selected = ornamentShape === opt.shape;
 
@@ -314,8 +310,8 @@ export default function WriteLetterPage() {
 
           {/* 색상 */}
           <div className="mt-6">
-            <div className="text-sm font-semibold text-neutral-800">색상 선택</div>
-            <div className="mt-3 flex items-center gap-3">
+            <div className="text-base font-semibold text-neutral-800">색상 선택</div>
+            <div className="mt-3 flex w-full justify-between rounded-2xl border border-neutral-700/40 bg-transparent px-6 py-4">
               {COLOR_OPTIONS.map((opt) => {
                 const selected = ornamentColor === opt.color;
 
@@ -345,18 +341,18 @@ export default function WriteLetterPage() {
           </div>
 
           {/* to/from */}
-          <div className="mt-7 space-y-3 text-sm text-neutral-900">
-            <div className="flex items-center gap-3">
-              <div className="w-10 font-semibold">to.</div>
-              <div className="flex-1 border-b border-neutral-700/40 pb-1">
+          <div className="mt-7 space-y-4 text-base text-neutral-900">
+            <div className="select-none caret-transparent flex items-center gap-4">
+              <div className="w-20 font-semibold">to.</div>
+              <div className="select-none caret-transparent flex-1 border-b border-neutral-700/40 pb-1.5">
                 {userid ?? "받는이"}
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="w-10 font-semibold">from.</div>
+            <div className="flex items-center gap-4">
+              <div className="select-none caret-transparent w-20 font-semibold">from.</div>
               <input
-                className="flex-1 rounded-lg bg-white/35 px-3 py-2 outline-none ring-1 ring-neutral-500/30 focus:ring-2 focus:ring-[#8E2F2F]"
+                className="h-11 flex-1 rounded-lg bg-white/35 px-3 text-base outline-none ring-1 ring-neutral-500/30 focus:ring-2 focus:ring-[#8E2F2F]"
                 placeholder="닉네임"
                 value={writerNickname}
                 onChange={(e) => setWriterNickname(e.target.value)}
@@ -366,10 +362,10 @@ export default function WriteLetterPage() {
 
           {/* 비밀번호: 작성에서만 */}
           {!isEdit && (
-            <div className="mt-5">
-              <div className="text-sm font-semibold text-neutral-800">비밀번호</div>
+            <div className="mt-5 flex items-center gap-4">
+              <span className="w-20 text-base font-semibold text-neutral-800">비밀번호</span>
               <input
-                className="mt-2 w-36 rounded-lg bg-white/35 px-3 py-2 text-center tracking-widest outline-none ring-1 ring-neutral-500/30 focus:ring-2 focus:ring-[#8E2F2F]"
+                className="h-11 w-40 rounded-lg bg-white/35 px-3 text-center text-base tracking-widest outline-none ring-1 ring-neutral-500/30 focus:ring-2 focus:ring-[#8E2F2F]"
                 placeholder="****"
                 inputMode="numeric"
                 pattern="\d*"
@@ -378,7 +374,7 @@ export default function WriteLetterPage() {
                   setPasswordForEdit(e.target.value.replace(/\D/g, "").slice(0, 4))
                 }
               />
-              <div className="mt-1 text-xs text-neutral-700">숫자 4자리</div>
+              <span className="select-none caret-transparent text-base text-neutral-700">숫자 4자리</span>
             </div>
           )}
 

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import BackButton from "../common/BackButton";
 
 type Mode = "write" | "view";
 
@@ -40,13 +41,7 @@ export default function LetterSheet({
       <div className="mx-auto max-w-[var(--layout-max-width)] px-[var(--layout-side-padding)] pt-4 pb-4">
         {/* top bar */}
         <header className="flex items-start justify-between">
-          <button
-            type="button"
-            onClick={onBack}
-            className="text-xl"
-          >
-            ← 이전
-          </button>
+          <BackButton onClick={onBack} />
           {rightTopSlot ? <div className="p-2">{rightTopSlot}</div> : <div />}
         </header>
 
