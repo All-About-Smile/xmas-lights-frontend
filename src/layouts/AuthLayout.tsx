@@ -13,7 +13,7 @@ export function AuthLayout({ title, children }: AuthLayoutProps) {
       <div className="mx-auto flex min-h-screen max-w-md flex-col px-6 pb-16 pt-8">
         {/* 상단 로고 + 홈 버튼 */}
         <header className="mb-20 flex items-center justify-between">
-          <span className="text-sm font-medium">반짝이는 X-mas 전구</span>
+          <span className="text-sm font-medium">밝혀줘! 내 X-mas 전구</span>
 
           <HomeButton
             to="/"
