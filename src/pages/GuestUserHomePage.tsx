@@ -117,7 +117,12 @@ export default function GuestUserHomePage() {
             className="p-2"
             aria-label="메인으로"
           >
-            <span className="text-xl">🏠</span>
+            <img
+              src="/Home.png"
+              alt=""
+              draggable={false}
+              className="h-7 w-7"
+            />
           </button>
         </header>
 

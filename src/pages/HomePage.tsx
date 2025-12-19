@@ -174,11 +174,12 @@ export default function HomePage() {
             className="p-2"
             aria-label="메뉴 열기"
           >
-            <div className="flex flex-col gap-1">
-              <span className="block h-[3px] w-7 rounded bg-neutral-900" />
-              <span className="block h-[3px] w-7 rounded bg-neutral-900" />
-              <span className="block h-[3px] w-7 rounded bg-neutral-900" />
-            </div>
+            <img
+              src="/Menu.png"
+              alt=""
+              draggable={false}
+              className="h-7 w-7"
+            />
           </button>
         </header>
 
