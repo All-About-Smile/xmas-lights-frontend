@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import LetterSheet from "@/components/letter/LetterSheet";
+import LoadingText from "@/components/common/LoadingText";
 import apiClient from "@/lib/apiClient";
 import { toBulbKey } from "@/utils/bulbKey";
 import { BULB_IMAGES } from "@/components/scene/bulbImages";
@@ -70,7 +71,7 @@ export default function ReadLetterPage() {
   if (loading || !letter) {
     return (
       <div className="min-h-screen grid place-items-center bg-[#D8D1CE]">
-        불러오는 중...
+        <LoadingText />
       </div>
     );
   }

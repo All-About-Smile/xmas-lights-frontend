@@ -1,5 +1,6 @@
 import Bulb from "@/components/scene/Bulb";
 import type { BulbItem } from "@/components/scene/types";
+import LoadingText from "@/components/common/LoadingText";
 
 type Slot = {
   left: string;
@@ -85,7 +86,7 @@ export default function OrnamentLayer({
       {/* loading overlay */}
       {loading && (
         <div className="absolute inset-0 z-[20] grid place-items-center text-sm text-gray-700 bg-white/20">
-          불러오는 중...
+          <LoadingText />
         </div>
       )}
     </>

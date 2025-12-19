@@ -6,6 +6,7 @@ import Input from "../components/ui/Input";
 import Label from "../components/ui/Label";
 import Button from "../components/ui/Button";
 import { useAuth } from "../contexts/AuthContext";
+import LoadingText from "../components/common/LoadingText";
 
 function AccountSettingsPage() {
   const { user, isLoading } = useAuth();
@@ -42,7 +43,7 @@ function AccountSettingsPage() {
     return (
       <AuthLayout title="계정 설정">
         <div className="p-6 text-center text-sm text-neutral-700">
-          불러오는 중...
+          <LoadingText />
         </div>
       </AuthLayout>
     );

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import LetterSheet from "@/components/letter/LetterSheet";
+import LoadingText from "@/components/common/LoadingText";
 import { BULB_IMAGES } from "@/components/scene/bulbImages";
 import { toBulbKey } from "@/utils/bulbKey";
 
@@ -255,7 +256,7 @@ export default function WriteLetterPage() {
   if (!editLoaded) {
     return (
       <div className="min-h-screen grid place-items-center bg-[#D8D1CE] text-neutral-900">
-        {editLoading ? "불러오는 중..." : "준비 중..."}
+        {editLoading ? <LoadingText /> : "준비 중..."}
       </div>
     );
   }
