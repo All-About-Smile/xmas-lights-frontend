@@ -29,8 +29,6 @@ export default function OrnamentLayer({
   hasPrev,
   hasNext,
   loading,
-  pageIndex,
-  pageCount,
   onPrev,
   onNext,
   onOpenLetter,
