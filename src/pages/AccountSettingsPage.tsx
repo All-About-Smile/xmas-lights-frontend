@@ -96,7 +96,6 @@ function AccountSettingsPage() {
         <div className="pt-4">
           <Button
             type="submit"
-            className="h-12 w-full rounded-xl bg-[#8E2F2F] text-base font-semibold text-white shadow-[0_6px_0_rgba(0,0,0,0.18)] hover:bg-[#7A2424]"
           >
             저장
           </Button>
