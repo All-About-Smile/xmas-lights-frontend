@@ -19,6 +19,7 @@ type Props = {
   // UI 이벤트
   onBack?: () => void;
   rightTopSlot?: ReactNode; // 햄버거 같은 거 끼우고 싶으면
+  bottomSlot?: ReactNode;
 };
 
 export default function LetterSheet({
@@ -30,12 +31,13 @@ export default function LetterSheet({
   onChangeContent,
   onBack,
   rightTopSlot,
+  bottomSlot,
 }: Props) {
   const isWrite = mode === "write";
 
   return (
     <div className="min-h-screen bg-[#D8D1CE]">
-      <div className="mx-auto max-w-[430px] px-5 pt-4 pb-6">
+      <div className="mx-auto max-w-[430px] px-5 pt-4 pb-4">
         {/* top bar */}
         <header className="flex items-start justify-between">
         <button type="button" onClick={onBack}>← 이전</button>
@@ -85,7 +87,7 @@ export default function LetterSheet({
           </div>
         </div>
 
-        {/* bottom button slot (페이지에서 넣어도 됨) */}
+        {bottomSlot ? <div className="mt-4">{bottomSlot}</div> : null}
       </div>
     </div>
   );

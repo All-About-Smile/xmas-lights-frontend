@@ -405,18 +405,17 @@ export default function WriteLetterPage() {
         content={content}
         onChangeContent={setContent}
         onBack={onBack}
+        bottomSlot={
+          <button
+            type="button"
+            onClick={() => setOpenConfirm(true)}
+            disabled={submitting || content.trim().length === 0}
+            className="h-14 w-full rounded-xl bg-[#8E2F2F] text-lg font-semibold text-white disabled:opacity-40"
+          >
+            {submitting ? "저장 중..." : isEdit ? "수정 저장하기" : "저장하기"}
+          </button>
+        }
       />
-
-      <div className="mx-auto max-w-[430px] px-5 pb-4 -mt-3">
-        <button
-          type="button"
-          onClick={() => setOpenConfirm(true)}
-          disabled={submitting || content.trim().length === 0}
-          className="h-14 w-full rounded-xl bg-[#8E2F2F] text-lg font-semibold text-white disabled:opacity-40"
-        >
-          {submitting ? "저장 중..." : isEdit ? "수정 저장하기" : "저장하기"}
-        </button>
-      </div>
 
       <ConfirmSaveModal
         open={openConfirm}
