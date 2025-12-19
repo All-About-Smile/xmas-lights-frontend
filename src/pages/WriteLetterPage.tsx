@@ -264,7 +264,7 @@ export default function WriteLetterPage() {
   if (step === 1) {
     return (
       <div className="min-h-screen bg-[#D8D1CE]">
-        <div className="mx-auto max-w-[430px] px-5 pt-4 pb-10">
+        <div className="mx-auto max-w-[var(--layout-max-width)] px-[var(--layout-side-padding)] pt-4 pb-10">
           <header className="flex items-start justify-between">
             <button
               type="button"

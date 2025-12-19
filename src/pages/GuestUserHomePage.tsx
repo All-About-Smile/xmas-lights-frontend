@@ -347,7 +347,7 @@ export default function GuestUserHomePage() {
 
   return (
     <div className="h-[100dvh] overflow-hidden select-none caret-transparent bg-[#D8D1CE] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.6),transparent_45%)]">
-      <div className="mx-auto max-w-[430px] h-full px-5 pt-4 pb-4 flex flex-col">
+      <div className="mx-auto max-w-[var(--layout-max-width)] h-full px-[var(--layout-side-padding)] pt-4 pb-4 flex flex-col">
         {/* top bar */}
         <header className="flex items-start justify-between">
           <div className="text-sm font-medium text-neutral-800">밝혀줘! 내 X-mas 전구</div>
