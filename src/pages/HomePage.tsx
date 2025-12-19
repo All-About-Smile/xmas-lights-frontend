@@ -190,7 +190,10 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#D8D1CE] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.6),transparent_45%)]">
+    <div
+      className="min-h-screen select-none caret-transparent bg-[#D8D1CE] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.6),transparent_45%)]"
+      onDragStart={(e) => e.preventDefault()}
+    >
       <div className="mx-auto max-w-[430px] px-5 pt-4 pb-6">
         {/* top bar */}
         <header className="flex items-start justify-between">
