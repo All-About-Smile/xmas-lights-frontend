@@ -12,6 +12,7 @@ import type { BulbItem } from "@/components/scene/types";
 
 import { deleteUserLetter, getUserLetters,fetchLetterForEdit } from "@/api/letterApi";
 import { toBulbKey } from "@/utils/bulbKey";
+import HomeButton from "@/components/navigation/HomeButton";
 
 type ActionMode = "edit" | "delete";
 
@@ -351,14 +352,7 @@ export default function GuestUserHomePage() {
         <header className="flex items-start justify-between">
           <div className="text-sm font-medium text-neutral-800">밝혀줘! 내 X-mas 전구</div>
 
-          <button
-            type="button"
-            onClick={() => navigate("/")}
-            className="p-2"
-            aria-label="메인으로"
-          >
-            <span className="text-xl">🏠</span>
-          </button>
+          <HomeButton onClick={() => navigate("/")} ariaLabel="메인으로" />
         </header>
 
         {/* title section */}
