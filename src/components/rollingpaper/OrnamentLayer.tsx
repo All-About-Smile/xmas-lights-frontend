@@ -78,11 +78,6 @@ export default function OrnamentLayer({
         </button>
       )}
 
-      {/* page indicator */}
-      <div className="absolute bottom-0.5 left-1/2 -translate-x-1/2 z-[10] text-sm bg-white/70 px-3 py-1 rounded">
-        {pageIndex} / {pageCount}
-      </div>
-
       {/* loading overlay */}
       {loading && (
         <div className="absolute inset-0 z-[20] grid place-items-center text-sm text-gray-700 bg-white/20">

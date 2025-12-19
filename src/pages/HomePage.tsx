@@ -9,6 +9,7 @@ import SideDrawer from "../components/SideDrawer";
 import { SLOTS, PAGE_SIZE } from "../components/scene/sceneSlots";
 import { BULB_IMAGES } from "../components/scene/bulbImages";
 import type { BulbItem } from "../components/scene/types";
+import PageIndicator from "@/components/common/PageIndicator";
 
 import { useAuth } from "../contexts/AuthContext";
 import { getUserLetters } from "../api/letterApi";
@@ -244,6 +245,9 @@ export default function HomePage() {
                 />
               </Scene>
             </div>
+          </div>
+          <div className="mt-3 flex justify-center">
+            <PageIndicator pageIndex={pageIndex} pageCount={pageCount} />
           </div>
         </div>
 
