@@ -9,6 +9,7 @@ import SideDrawer from "../components/SideDrawer";
 import { SLOTS, PAGE_SIZE } from "../components/scene/sceneSlots";
 import { BULB_IMAGES } from "../components/scene/bulbImages";
 import type { BulbItem } from "../components/scene/types";
+import PageIndicator from "@/components/common/PageIndicator";
 
 import { useAuth } from "../contexts/AuthContext";
 import { getUserLetters } from "../api/letterApi";
@@ -190,8 +191,11 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#D8D1CE] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.6),transparent_45%)]">
-      <div className="mx-auto max-w-[430px] px-5 pt-4 pb-6">
+    <div
+      className="min-h-screen select-none caret-transparent bg-[#D8D1CE] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.6),transparent_45%)]"
+      onDragStart={(e) => e.preventDefault()}
+    >
+      <div className="mx-auto max-w-[var(--layout-max-width)] px-[var(--layout-side-padding)] pt-4 pb-6">
         {/* top bar */}
         <header className="flex items-start justify-between">
           <div className="text-sm font-medium text-neutral-800">
@@ -241,6 +245,9 @@ export default function HomePage() {
                 />
               </Scene>
             </div>
+          </div>
+          <div className="mt-3 flex justify-center">
+            <PageIndicator pageIndex={pageIndex} pageCount={pageCount} />
           </div>
         </div>
 

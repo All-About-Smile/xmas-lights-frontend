@@ -7,7 +7,7 @@ type BulbProps = {
 };
 
 const BULB_WIDTH = "min(18%, 88px)";
-const LABEL_GAP_PX = 2;
+const LABEL_GAP_PX = 5;
 export default function Bulb({
   left,
   top,

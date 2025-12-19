@@ -7,7 +7,7 @@ type MenuButtonProps = {
 
 export default function MenuButton({
   onClick,
-  ariaLabel = "¸Þ´º ¿­±â",
+  ariaLabel = "ë©”ë‰´ ì—´ê¸°",
   className = "",
 }: MenuButtonProps) {
   return (

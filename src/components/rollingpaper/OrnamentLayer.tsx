@@ -1,5 +1,7 @@
 import Bulb from "@/components/scene/Bulb";
 import type { BulbItem } from "@/components/scene/types";
+import LoadingText from "@/components/common/LoadingText";
+import PageArrowButton from "@/components/common/PageArrowButton";
 
 type Slot = {
   left: string;
@@ -27,8 +29,6 @@ export default function OrnamentLayer({
   hasPrev,
   hasNext,
   loading,
-  pageIndex,
-  pageCount,
   onPrev,
   onNext,
   onOpenLetter,
@@ -56,36 +56,27 @@ export default function OrnamentLayer({
 
       {/* arrows */}
       {hasPrev && (
-        <button
-          type="button"
+        <PageArrowButton
+          direction="prev"
           disabled={loading}
           onClick={onPrev}
-          className="absolute left-3 top-1/2 -translate-y-1/2 z-[10] px-2 py-2 rounded bg-white/70 disabled:opacity-30"
-        >
-          ◀
-        </button>
+          className="absolute left-3 top-[55%] -translate-y-1/2"
+        />
       )}
 
       {hasNext && (
-        <button
-          type="button"
+        <PageArrowButton
+          direction="next"
           disabled={loading}
           onClick={onNext}
-          className="absolute right-3 top-1/2 -translate-y-1/2 z-[10] px-2 py-2 rounded bg-white/70 disabled:opacity-30"
-        >
-          ▶
-        </button>
+          className="absolute right-3 top-[55%] -translate-y-1/2"
+        />
       )}
-
-      {/* page indicator */}
-      <div className="absolute bottom-0.5 left-1/2 -translate-x-1/2 z-[10] text-sm bg-white/70 px-3 py-1 rounded">
-        {pageIndex} / {pageCount}
-      </div>
 
       {/* loading overlay */}
       {loading && (
         <div className="absolute inset-0 z-[20] grid place-items-center text-sm text-gray-700 bg-white/20">
-          불러오는 중...
+          <LoadingText />
         </div>
       )}
     </>

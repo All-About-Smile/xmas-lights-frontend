@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import BackButton from "../common/BackButton";
 
 type Mode = "write" | "view";
 
@@ -19,6 +20,7 @@ type Props = {
   // UI 이벤트
   onBack?: () => void;
   rightTopSlot?: ReactNode; // 햄버거 같은 거 끼우고 싶으면
+  bottomSlot?: ReactNode;
 };
 
 export default function LetterSheet({
@@ -30,16 +32,17 @@ export default function LetterSheet({
   onChangeContent,
   onBack,
   rightTopSlot,
+  bottomSlot,
 }: Props) {
   const isWrite = mode === "write";
 
   return (
     <div className="min-h-screen bg-[#D8D1CE]">
-      <div className="mx-auto max-w-[430px] px-5 pt-4 pb-6">
+      <div className="mx-auto max-w-[var(--layout-max-width)] px-[var(--layout-side-padding)] pt-4 pb-4">
         {/* top bar */}
         <header className="flex items-start justify-between">
-        <button type="button" onClick={onBack}>← 이전</button>
-        {rightTopSlot ? <div className="p-2">{rightTopSlot}</div> : <div />}
+          <BackButton onClick={onBack} />
+          {rightTopSlot ? <div className="p-2">{rightTopSlot}</div> : <div />}
         </header>
 
         {/* letter card area */}
@@ -54,7 +57,7 @@ export default function LetterSheet({
           {/* paper */}
           <div className="relative mx-auto w-full rounded-2xl border border-neutral-700/40 bg-transparent">
             <div className="p-6 pt-10">
-              <div className="text-sm text-neutral-900">to. {toName}</div>
+              <div className="text-lg text-neutral-900">To. {toName}</div>
 
               {/* content */}
               <div className="mt-4">
@@ -64,28 +67,28 @@ export default function LetterSheet({
                       value={content}
                       onChange={(e) => onChangeContent?.(e.target.value.slice(0, 200))}
                       maxLength={200}
-                      className="w-full min-h-[320px] resize-none bg-transparent outline-none text-neutral-900 leading-6"
+                      className="w-full min-h-[240px] max-h-[320px] resize-none bg-transparent text-2xl text-neutral-900 leading-9 outline-none"
                       placeholder="메세지를 적어주세요"
                     />
-                    <div className="mt-2 text-right text-xs text-neutral-700">
+                    <div className="mt-2 text-right text-base text-neutral-700">
                       {content.length}/200
                     </div>
                   </>
                 ) : (
-                  <div className="min-h-[320px] whitespace-pre-wrap text-neutral-900 leading-6">
+                  <div className="min-h-[240px] whitespace-pre-wrap text-2xl text-neutral-900 leading-9">
                     {content}
                   </div>
                 )}
               </div>
 
-              <div className="mt-6 text-right text-sm text-neutral-900">
-                from. {fromName}
+              <div className="mt-6 text-right text-lg text-neutral-900">
+                From. {fromName}
               </div>
             </div>
           </div>
         </div>
 
-        {/* bottom button slot (페이지에서 넣어도 됨) */}
+        {bottomSlot ? <div className="mt-4">{bottomSlot}</div> : null}
       </div>
     </div>
   );

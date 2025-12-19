@@ -23,7 +23,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#D8D1CE]">
-      <div className="mx-auto max-w-[430px] px-5 pt-6 pb-10">
+      <div className="mx-auto max-w-[var(--layout-max-width)] px-[var(--layout-side-padding)] pt-6 pb-10">
         {/* top bar */}
         <header className="flex items-start justify-between">
           <div className="text-sm font-medium text-neutral-800">

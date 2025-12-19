@@ -78,7 +78,6 @@ export default function LoginPage() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="h-14 w-full rounded-xl bg-[#8E2F2F] text-lg font-semibold text-white shadow-[0_6px_0_rgba(0,0,0,0.18)] hover:bg-[#7A2424] disabled:opacity-60"
           >
             {isLoading ? "로그인 중..." : "로그인 하기"}
           </Button>

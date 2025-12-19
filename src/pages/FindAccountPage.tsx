@@ -77,7 +77,6 @@ function FindAccountPage() {
         <div className="pt-4">
           <Button
             type="submit"
-            className="h-14 w-full rounded-xl bg-[#8E2F2F] text-lg font-semibold text-white shadow-[0_6px_0_rgba(0,0,0,0.18)] hover:bg-[#7A2424]"
           >
             {isIdMode ? "확인" : "비밀번호 초기화"}
           </Button>
