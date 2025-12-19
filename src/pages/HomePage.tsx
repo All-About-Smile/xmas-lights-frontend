@@ -186,7 +186,7 @@ export default function HomePage() {
       setShowLockedPopup(true);
       return;
     }
-    navigate(`/letters/${id}`);
+    navigate(`/users/${userid}/letters/${id}`);
   };
 
   return (

@@ -4,7 +4,7 @@ import ProtectedRoute from "./ProtectedRoute";
 
 import HomePage from "../pages/HomePage";
 import AccountSettingsPage from "../pages/AccountSettingsPage";
-import LetterTempPage from "../pages/LetterTempPage";
+import ReadLetterPage from "../pages/ReadLetterPage";
 
 export const privateRoutes: RouteObject[] = [
   {
@@ -25,7 +25,11 @@ export const privateRoutes: RouteObject[] = [
   },
   // 편지 임시 페이지 (나중에 삭제 예정)
   {
-    path: "/letters/:id",
-    element: <LetterTempPage />,
+    path:"/users/:userid/letters/:letter_number",
+    element:(
+      <ProtectedRoute>
+        <ReadLetterPage />
+      </ProtectedRoute>
+    ),
   },
 ];
