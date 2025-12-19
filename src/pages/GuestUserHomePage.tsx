@@ -352,7 +352,7 @@ export default function GuestUserHomePage() {
         <header className="flex items-start justify-between">
           <div className="text-sm font-medium text-neutral-800">밝혀줘! 내 X-mas 전구</div>
 
-          <HomeButton onClick={() => navigate("/")} ariaLabel="메인으로" />
+          <HomeButton to="/" ariaLabel="메인으로" />
         </header>
 
         {/* title section */}
