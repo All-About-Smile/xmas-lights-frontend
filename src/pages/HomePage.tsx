@@ -61,6 +61,35 @@ export default function HomePage() {
 
   const hasPrev = offset > 0;
 
+  const [openShare, setOpenShare] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const shareUrl = useMemo(() => {
+    if (!userid) return "";
+    return `${window.location.origin}/users/${encodeURIComponent(userid)}`;
+  }, [userid]);
+
+
+  const copyShareUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
+    } catch {
+      // fallback (구형 브라우저)
+      const ta = document.createElement("textarea");
+      ta.value = shareUrl;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1200);
+    }
+  };
+
+
+
   const displayName = useMemo(() => {
     // user에 닉네임이 있으면 우선 사용, 없으면 userid로 대체
     return (user as any)?.nickname ?? (user as any)?.userid ?? "사용자";
@@ -217,7 +246,7 @@ export default function HomePage() {
 
         {/* bottom share button */}
         <button
-          onClick={() => alert("공유 기능은 다음 단계에서 연결할게!")}
+          onClick={() => setOpenShare(true)}
           className="mt-8 h-14 w-full rounded-xl bg-[#8E2F2F] text-lg font-semibold text-white shadow-[0_10px_20px_rgba(0,0,0,0.18)]"
         >
           창문 링크 공유하기
@@ -227,6 +256,67 @@ export default function HomePage() {
       <SideDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
 
       {showLockedPopup && <LockedPopup onClose={() => setShowLockedPopup(false)} />}
+
+      {openShare && (
+        <div
+          className="fixed inset-0 z-[120] flex items-center justify-center bg-black/40 px-4"
+          onClick={() => setOpenShare(false)}
+        >
+          <div
+            className="w-[430px] max-w-[100vw] rounded-2xl bg-white shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* header */}
+            <div className="flex items-center justify-between px-6 pt-5">
+              <div className="text-base font-bold text-neutral-900">공유 링크</div>
+              <button
+                type="button"
+                onClick={() => setOpenShare(false)}
+                className="text-neutral-500 hover:text-neutral-800"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* body */}
+            <div className="px-6 pb-6 pt-4">
+              <div className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-3">
+                <input
+                  readOnly
+                  value={shareUrl}
+                  className="w-full bg-transparent text-sm text-neutral-800 outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={copyShareUrl}
+                  className="shrink-0 rounded-lg px-2 py-1 text-lg"
+                  aria-label="복사"
+                  title="복사"
+                >
+                  📋
+                </button>
+              </div>
+
+              {copied && (
+                <div className="mt-2 text-sm text-green-700">
+                  링크가 복사되었어요!
+                </div>
+              )}
+
+              <div className="mt-4 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setOpenShare(false)}
+                  className="h-10 rounded-lg bg-neutral-200 px-4 text-sm font-semibold text-neutral-900"
+                >
+                  닫기
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
