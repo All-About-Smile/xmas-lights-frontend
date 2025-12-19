@@ -13,6 +13,7 @@ import type { BulbItem } from "@/components/scene/types";
 import { deleteUserLetter, getUserLetters,fetchLetterForEdit } from "@/api/letterApi";
 import { toBulbKey } from "@/utils/bulbKey";
 import HomeButton from "@/components/navigation/HomeButton";
+import PageIndicator from "@/components/common/PageIndicator";
 
 type ActionMode = "edit" | "delete";
 
@@ -346,8 +347,11 @@ export default function GuestUserHomePage() {
   };
 
   return (
-    <div className="h-[100dvh] overflow-hidden select-none caret-transparent bg-[#D8D1CE] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.6),transparent_45%)]">
-      <div className="mx-auto max-w-[var(--layout-max-width)] h-full px-[var(--layout-side-padding)] pt-4 pb-4 flex flex-col">
+    <div
+      className="min-h-screen select-none caret-transparent bg-[#D8D1CE] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.6),transparent_45%)]"
+      onDragStart={(e) => e.preventDefault()}
+    >
+      <div className="mx-auto max-w-[var(--layout-max-width)] px-[var(--layout-side-padding)] pt-4 pb-6">
         {/* top bar */}
         <header className="flex items-start justify-between">
           <div className="text-sm font-medium text-neutral-800">밝혀줘! 내 X-mas 전구</div>
@@ -356,7 +360,7 @@ export default function GuestUserHomePage() {
         </header>
 
         {/* title section */}
-        <div className="mt-4">
+        <div className="mt-6">
           <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900">
             {displayName} 님의 창문
           </h1>
@@ -366,8 +370,13 @@ export default function GuestUserHomePage() {
         </div>
 
         {/* window area */}
-        <div className="mt-4 flex-1 min-h-0 flex items-center justify-center">
-          <div className="relative h-[min(54dvh,480px)] w-auto max-w-full overflow-hidden rounded-none shadow-none aspect-[430/535]">
+        <div className="mt-5">
+          <div
+            className="relative w-full overflow-hidden rounded-none shadow-none"
+            style={{
+              height: "min(62dvh, 720px)",
+            }}
+          >
             <div className="relative h-full w-full">
               <Scene>
                 <OrnamentLayer
@@ -381,23 +390,24 @@ export default function GuestUserHomePage() {
                   pageCount={pageCount}
                   onPrev={onPrev}
                   onNext={onNext}
-                  onOpenLetter={onOpenLetter} // ✅ 여기 중요
+                  onOpenLetter={onOpenLetter} // ? ?? ??
                 />
               </Scene>
             </div>
           </div>
+          <div className="mt-3 flex justify-center">
+            <PageIndicator pageIndex={pageIndex} pageCount={pageCount} />
+          </div>
         </div>
 
         {/* bottom buttons */}
-        <div className="mt-4 space-y-3">
-          <button
-            type="button"
-            onClick={goWriteLetter}
-            className="h-14 w-full rounded-xl bg-[#8E2F2F] text-lg font-semibold text-white shadow-[0_10px_20px_rgba(0,0,0,0.18)]"
-          >
-            창문 꾸미기
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={goWriteLetter}
+          className="mt-8 h-14 w-full rounded-xl bg-[#8E2F2F] text-lg font-semibold text-white shadow-[0_10px_20px_rgba(0,0,0,0.18)]"
+        >
+          ?? ???
+        </button>
       </div>
 
       {/* ✅ 모달들 */}
