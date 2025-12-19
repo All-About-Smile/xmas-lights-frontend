@@ -1,6 +1,7 @@
 import Bulb from "@/components/scene/Bulb";
 import type { BulbItem } from "@/components/scene/types";
 import LoadingText from "@/components/common/LoadingText";
+import PageArrowButton from "@/components/common/PageArrowButton";
 
 type Slot = {
   left: string;
@@ -57,25 +58,21 @@ export default function OrnamentLayer({
 
       {/* arrows */}
       {hasPrev && (
-        <button
-          type="button"
+        <PageArrowButton
+          direction="prev"
           disabled={loading}
           onClick={onPrev}
-          className="absolute left-3 top-1/2 -translate-y-1/2 z-[10] px-2 py-2 rounded bg-white/70 disabled:opacity-30"
-        >
-          ◀
-        </button>
+          className="absolute left-3 top-[55%] -translate-y-1/2"
+        />
       )}
 
       {hasNext && (
-        <button
-          type="button"
+        <PageArrowButton
+          direction="next"
           disabled={loading}
           onClick={onNext}
-          className="absolute right-3 top-1/2 -translate-y-1/2 z-[10] px-2 py-2 rounded bg-white/70 disabled:opacity-30"
-        >
-          ▶
-        </button>
+          className="absolute right-3 top-[55%] -translate-y-1/2"
+        />
       )}
 
       {/* loading overlay */}
