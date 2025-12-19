@@ -13,6 +13,7 @@ import type { BulbItem } from "../components/scene/types";
 import { useAuth } from "../contexts/AuthContext";
 import { getUserLetters } from "../api/letterApi";
 import { isUnlockedByServerDate } from "../utils/time";
+import MenuButton from "@/components/navigation/MenuButton";
 
 
 
@@ -169,17 +170,7 @@ export default function HomePage() {
           </div>
 
           {/* hamburger */}
-          <button
-            onClick={() => setDrawerOpen(true)}
-            className="p-2"
-            aria-label="메뉴 열기"
-          >
-            <div className="flex flex-col gap-1">
-              <span className="block h-[3px] w-7 rounded bg-neutral-900" />
-              <span className="block h-[3px] w-7 rounded bg-neutral-900" />
-              <span className="block h-[3px] w-7 rounded bg-neutral-900" />
-            </div>
-          </button>
+          <MenuButton onClick={() => setDrawerOpen(true)} ariaLabel="메뉴 열기" />
         </header>
 
         {/* title section */}
