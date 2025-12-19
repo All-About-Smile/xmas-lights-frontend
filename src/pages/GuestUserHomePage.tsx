@@ -406,7 +406,7 @@ export default function GuestUserHomePage() {
           onClick={goWriteLetter}
           className="mt-8 h-14 w-full rounded-xl bg-[#8E2F2F] text-lg font-semibold text-white shadow-[0_10px_20px_rgba(0,0,0,0.18)]"
         >
-          ?? ???
+          창문 꾸미기
         </button>
       </div>
 
