@@ -39,20 +39,11 @@ export default function SideDrawer({ open, onClose }: SideDrawerProps) {
         {/* header */}
         <div className="flex items-center justify-between px-6 pt-6">
           <div>
-            <div className="text-xl font-semibold">
+            <div className="text-lg font-semibold">
               {isAuthenticated
-                ? `${user?.email ?? "사용자"} 님, 안녕하세요`
+                ? `${user?.userid ?? "사용자"} 님, 안녕하세요`
                 : "안녕하세요"}
             </div>
-
-            {isAuthenticated && (
-              <button
-                onClick={handleLogout}
-                className="mt-1 text-sm text-neutral-500 underline"
-              >
-                로그아웃
-              </button>
-            )}
           </div>
 
           <button
@@ -83,17 +74,20 @@ export default function SideDrawer({ open, onClose }: SideDrawerProps) {
           >
             내 창문 보러가기
           </Link>
-
-          <button
-            className="block w-full py-4 text-left"
-            onClick={() => {
-              alert("즐겨찾기 (추후 구현)");
-              onClose();
-            }}
-          >
-            즐겨찾기 목록
-          </button>
         </nav>
+
+        <div className="mt-6 h-px bg-black/10" />
+
+        <div>
+          {isAuthenticated && (
+              <button
+                onClick={handleLogout}
+                className="mt-6 px-6 text-lg text-neutral-500 underline"
+              >
+                로그아웃
+              </button>
+            )}
+        </div>
       </aside>
     </>
   );
