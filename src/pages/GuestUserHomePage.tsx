@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import OrnamentLayer from "@/components/rollingpaper/OrnamentLayer";
 import Scene from "@/components/scene/Scene";
 
@@ -8,7 +10,7 @@ import { SLOTS, PAGE_SIZE } from "@/components/scene/sceneSlots";
 import { BULB_IMAGES } from "@/components/scene/bulbImages";
 import type { BulbItem } from "@/components/scene/types";
 
-import { deleteUserLetter, getUserLetters } from "@/api/letterApi";
+import { deleteUserLetter, getUserLetters,fetchLetterForEdit } from "@/api/letterApi";
 import { toBulbKey } from "@/utils/bulbKey";
 
 type ActionMode = "edit" | "delete";
@@ -34,6 +36,9 @@ export default function GuestUserHomePage() {
   // ✅ 2) "정말 수정/삭제?" + 비번 입력 모달
   const [confirmMode, setConfirmMode] = useState<null | ActionMode>(null);
   const [pw, setPw] = useState("");
+  const [pwError, setPwError] = useState<string | null>(null);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
 
   // userid 바뀌면 첫 페이지로
   useEffect(() => {
@@ -145,6 +150,7 @@ export default function GuestUserHomePage() {
 
     setSelectedLetterNumber(n);
     setPw("");
+    setPwError(null);
     setActionOpen(true);
   };
 
@@ -152,6 +158,7 @@ export default function GuestUserHomePage() {
     setActionOpen(false);
     setConfirmMode(null);
     setPw("");
+    setPwError(null);
     setSelectedLetterNumber(null);
   };
 
@@ -159,42 +166,74 @@ export default function GuestUserHomePage() {
     setActionOpen(false);
     setConfirmMode(mode);
     setPw("");
+    setPwError(null);
   };
 
-  const goEdit = () => {
+  const goEdit = async () => {
     if (!userid || !selectedLetterNumber) return;
     if (!/^\d{4}$/.test(pw)) return;
 
-    // ✅ WriteLetterPage로 이동 (수정모드)
-    // 너희 goWriteLetter가 `/users/${userid}/letters`로 가니까, 수정도 동일 페이지로 보내되 state만 다르게
-    navigate(`/users/${userid}/letters`, {
-      state: { mode: "edit", letterNumber: selectedLetterNumber, password: pw },
-    });
-  };
+    try {
+        setConfirmLoading(true);
+        setPwError(null);
+
+        // ✅ 비번 검증(서버가 맞다 하면 성공)
+        await fetchLetterForEdit({
+        userid,
+        letterNumber: selectedLetterNumber,
+        password: pw,
+        });
+
+        // ✅ 성공한 경우에만 이동
+        navigate(`/users/${userid}/letters`, {
+        state: { mode: "edit", letterNumber: selectedLetterNumber, password: pw },
+        });
+    } catch (e) {
+        // ✅ 틀리면 팝업 유지 + 메시지 표시
+        if (axios.isAxiosError(e)) {
+        const status = e.response?.status;
+        if (status === 401 || status === 403) {
+            setPwError("비밀번호가 다릅니다.");
+            return;
+        }
+        }
+        setPwError("비밀번호 확인에 실패했어요. 잠시 후 다시 시도해주세요.");
+    } finally {
+        setConfirmLoading(false);
+    }
+    };
+
 
   const doDelete = async () => {
     if (!userid || !selectedLetterNumber) return;
     if (!/^\d{4}$/.test(pw)) return;
 
     try {
-      setLoading(true);
-      await deleteUserLetter({
+        setConfirmLoading(true);
+        setPwError(null);
+
+        await deleteUserLetter({
         userid,
         letterNumber: selectedLetterNumber,
         password: pw,
-      });
+        });
 
-      closeAll();
-
-      // ✅ 삭제 후 현재 페이지 다시 불러오기
-      await fetchPage({ keepLoadingState: true });
+        closeAll();
+        await fetchPage({ keepLoadingState: true });
     } catch (e) {
-      console.error("deleteUserLetter failed:", e);
-      // 필요하면 여기서 "비밀번호가 틀렸어요" 같은 UX 처리 가능
+        if (axios.isAxiosError(e)) {
+        const status = e.response?.status;
+        if (status === 401 || status === 403) {
+            setPwError("비밀번호가 다릅니다.");
+            return;
+        }
+        }
+        setPwError("삭제에 실패했어요. 잠시 후 다시 시도해주세요.");
     } finally {
-      setLoading(false);
+        setConfirmLoading(false);
     }
-  };
+    };
+
 
   function ActionSheet({ open }: { open: boolean }) {
     if (!open) return null;
@@ -271,6 +310,9 @@ export default function GuestUserHomePage() {
               
             }
           />
+          {pwError && (
+            <div className="mt-2 text-sm text-red-600">{pwError}</div>
+            )}
 
           <div className="mt-6 flex justify-end gap-3">
             <button
@@ -284,7 +326,7 @@ export default function GuestUserHomePage() {
             <button
               type="button"
               onClick={onConfirm}
-              disabled={!/^\d{4}$/.test(pw) || loading}
+              disabled={!/^\d{4}$/.test(pw) || loading || confirmLoading}
               className="rounded-xl bg-[#8E2F2F] px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
             >
               {btnText}
