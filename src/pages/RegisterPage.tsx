@@ -22,13 +22,17 @@ function RegisterPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // ✅ 유효성 검사 정규식
-  // 닉네임: 한글 1~5글자
-  const nicknameRegex = /^[가-힣]{1,5}$/;
 
-  // 비밀번호: 최소 8자 + 대문자/소문자/숫자/특수문자 포함
-  // (특수문자: 공백 제외, 어떤 기호든 OK)
-  const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/;
+  // 아이디: 한글/영문 1~10자 (숫자/특수문자/공백 불가)
+  // - 한글: 가-힣
+  // - 영문: a-zA-Z
+  const nicknameRegex = /^[가-힣a-zA-Z]{1,10}$/;
+
+  // 비밀번호: 최소 4자 + 영문 + 숫자 포함(특수문자/대문자 필수 X)
+  // - (?=.*[A-Za-z]) 영문 최소 1개
+  // - (?=.*\d) 숫자 최소 1개
+  // - .{4,} 4자 이상
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d).{4,}$/;
 
   // 이메일: 기본 형식 체크(너무 빡세게 검증하지 않는 버전)
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -45,15 +49,13 @@ function RegisterPage() {
 
     // 2) 닉네임 체크
     if (!nicknameRegex.test(id)) {
-      setErrorMsg("아이디는 한글 1~5글자로 입력해줘.");
+      setErrorMsg("아이디는 한글/영문 1~10글자로 입력해줘.");
       return;
     }
 
     // 3) 비밀번호 규칙 체크
     if (!passwordRegex.test(password)) {
-      setErrorMsg(
-        "비밀번호는 8자리 이상 + 대문자/소문자/숫자/특수문자를 모두 포함해야 해."
-      );
+      setErrorMsg("비밀번호는 4자리 이상이며 영문과 숫자를 모두 포함해야 해.");
       return;
     }
 
@@ -101,7 +103,7 @@ function RegisterPage() {
           <Input
             value={id}
             onChange={(e) => setId(e.target.value)}
-            placeholder="한글 1~5글자"
+            placeholder="한글/영문 1~10글자"
             autoComplete="nickname"
             className="h-14 rounded-xl border-none bg-[#F8EFD4] shadow-[0_4px_10px_rgba(0,0,0,0.08)]"
           />
@@ -113,7 +115,7 @@ function RegisterPage() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="8자+대/소문자+숫자+특수문자"
+            placeholder="4자+영문+숫자"
             autoComplete="new-password"
             className="h-14 rounded-xl border-none bg-[#F8EFD4] shadow-[0_4px_10px_rgba(0,0,0,0.08)]"
           />
