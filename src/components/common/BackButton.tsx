@@ -8,7 +8,7 @@ export default function BackButton({ onClick, className }: BackButtonProps) {
     <button
       type="button"
       onClick={onClick}
-      className={`text-lg ${className ?? ""}`}
+      className={`select-none caret-transparent text-lg ${className ?? ""}`}
     >
       ← 이전
     </button>

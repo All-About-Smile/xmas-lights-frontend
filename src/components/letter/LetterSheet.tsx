@@ -51,11 +51,11 @@ export default function LetterSheet({
           <img
             src={bulbSrc}
             alt=""
-            className="absolute left-1/2 -translate-x-1/2 -top-10 w-16 h-auto"
+            className="absolute left-1/2 -translate-x-1/2 -top-10 z-10 w-16 h-auto"
           />
 
           {/* paper */}
-          <div className="relative mx-auto w-full rounded-2xl border border-neutral-700/40 bg-transparent">
+          <div className="relative mx-auto w-full rounded-2xl border border-[#CBBFAF] bg-[#F7F1E6]">
             <div className="p-6 pt-10">
               <div className="text-lg text-neutral-900">To. {toName}</div>
 

@@ -272,7 +272,7 @@ export default function GuestUserHomePage() {
               <button
                 type="button"
                 onClick={() => openConfirm("edit")}
-                className="h-10 w-28 rounded-lg bg-neutral-800 text-white font-semibold"
+                className="text-base h-10 w-28 rounded-lg bg-neutral-800 text-white font-semibold"
               >
                 수정
               </button>
@@ -280,7 +280,7 @@ export default function GuestUserHomePage() {
               <button
                 type="button"
                 onClick={() => openConfirm("delete")}
-                className="h-10 w-28 rounded-lg bg-red-600 text-white font-semibold"
+                className="text-base h-10 w-28 rounded-lg bg-red-600 text-white font-semibold"
               >
                 삭제
               </button>
@@ -300,7 +300,7 @@ export default function GuestUserHomePage() {
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40">
         <div className="w-[360px] max-w-[90vw] rounded-2xl bg-white p-6 shadow-xl">
           <div className="text-lg font-extrabold text-neutral-900">{title}</div>
-          <div className="mt-2 text-sm text-neutral-700">
+          <div className="text-base mt-2 text-neutral-700">
             비밀번호(숫자 4자리)를 입력해주세요.
           </div>
 
@@ -322,7 +322,7 @@ export default function GuestUserHomePage() {
             <button
               type="button"
               onClick={() => setConfirmMode(null)}
-              className="rounded-xl bg-neutral-200 px-4 py-2 text-sm font-semibold"
+              className="text-base rounded-xl bg-neutral-200 px-4 py-2 font-semibold"
             >
               취소
             </button>
@@ -331,7 +331,7 @@ export default function GuestUserHomePage() {
               type="button"
               onClick={onConfirm}
               disabled={!/^\d{4}$/.test(pw) || loading || confirmLoading}
-              className="rounded-xl bg-[#8E2F2F] px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
+              className="text-base rounded-xl bg-[#8E2F2F] px-4 py-2 font-semibold text-white disabled:opacity-40"
             >
               {btnText}
             </button>
