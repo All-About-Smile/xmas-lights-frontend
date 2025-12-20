@@ -72,10 +72,10 @@ function ConfirmSaveModal({
         className="w-[360px] max-w-[90vw] rounded-2xl bg-white p-6 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="text-2xl font-extrabold text-neutral-900">
+        <div className="select-none caret-transparent text-2xl font-extrabold text-neutral-900">
           전구를 밝혀주시겠어요?
         </div>
-        <div className="mt-2 text-lg text-neutral-700">
+        <div className="select-none caret-transparent mt-2 text-lg text-neutral-700">
           메시지를 최종 확인해주세요!
         </div>
 
@@ -272,14 +272,14 @@ export default function WriteLetterPage() {
             <div />
           </header>
 
-          <h1 className="mt-6 text-2xl font-extrabold text-neutral-900">
+          <h1 className="select-none caret-transparent mt-6 text-2xl font-extrabold text-neutral-900">
             전구를 선택해주세요
           </h1>
 
           {/* 모양 */}
           <div className="mt-6">
-            <div className="text-base font-semibold text-neutral-800">모양 선택</div>
-            <div className="mt-3 flex w-full justify-between rounded-2xl border border-neutral-700/40 bg-transparent px-6 py-4">
+            <div className="select-none caret-transparent text-base font-semibold text-neutral-800">모양 선택</div>
+            <div className="select-none caret-transparent mt-3 flex w-full justify-between rounded-2xl border border-neutral-700/40 bg-transparent px-6 py-4">
               {ORNAMENT_OPTIONS.map((opt) => {
                 const selected = ornamentShape === opt.shape;
 
@@ -310,8 +310,8 @@ export default function WriteLetterPage() {
 
           {/* 색상 */}
           <div className="mt-6">
-            <div className="text-base font-semibold text-neutral-800">색상 선택</div>
-            <div className="mt-3 flex w-full justify-between rounded-2xl border border-neutral-700/40 bg-transparent px-6 py-4">
+            <div className="select-none caret-transparent text-base font-semibold text-neutral-800">색상 선택</div>
+            <div className="select-none caret-transparent mt-3 flex w-full justify-between rounded-2xl border border-neutral-700/40 bg-transparent px-6 py-4">
               {COLOR_OPTIONS.map((opt) => {
                 const selected = ornamentColor === opt.color;
 
