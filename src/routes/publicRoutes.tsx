@@ -6,6 +6,7 @@ import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import FindAccountPage from "../pages/FindAccountPage";
 import GuestUserHomePage from "@/pages/GuestUserHomePage";
+import NotFoundPage from "@/pages/NotFoundPage";
 import WriteLetterPage from "@/pages/WriteLetterPage";
 
 export function publicRoutes(isAuthenticated: boolean): RouteObject[] {
@@ -33,6 +34,14 @@ export function publicRoutes(isAuthenticated: boolean): RouteObject[] {
     { 
       path: "/users/:userid/letters",
        element: <WriteLetterPage /> 
+    },
+     { 
+      path: "/404",
+       element: <NotFoundPage /> 
+    },
+    { 
+      path: "*",
+       element: <NotFoundPage /> 
     },
   ];
 }

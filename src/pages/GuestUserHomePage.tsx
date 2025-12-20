@@ -10,7 +10,8 @@ import { SLOTS, PAGE_SIZE } from "@/components/scene/sceneSlots";
 import { BULB_IMAGES } from "@/components/scene/bulbImages";
 import type { BulbItem } from "@/components/scene/types";
 
-import { deleteUserLetter, getUserLetters,fetchLetterForEdit } from "@/api/letterApi";
+import { deleteUserLetter, getUserLetters, fetchLetterForEdit } from "@/api/letterApi";
+import { checkUserExists } from "@/api/userApi";
 import { toBulbKey } from "@/utils/bulbKey";
 import HomeButton from "@/components/navigation/HomeButton";
 import PageIndicator from "@/components/common/PageIndicator";
@@ -29,29 +30,61 @@ export default function GuestUserHomePage() {
   const [hasNext, setHasNext] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // ✅ 유저 존재 검증 상태
+  const [userOk, setUserOk] = useState<boolean | null>(null);
+
   const hasPrev = offset > 0;
 
-  // ✅ 오너먼트 클릭 후 선택된 편지 번호
   const [selectedLetterNumber, setSelectedLetterNumber] = useState<number | null>(null);
-
-  // ✅ 1) 수정/삭제 선택 바텀시트
   const [actionOpen, setActionOpen] = useState(false);
-
-  // ✅ 2) "정말 수정/삭제?" + 비번 입력 모달
   const [confirmMode, setConfirmMode] = useState<null | ActionMode>(null);
   const [pw, setPw] = useState("");
   const [pwError, setPwError] = useState<string | null>(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
 
-
-  // userid 바뀌면 첫 페이지로
+  // ✅ userid 바뀌면 초기화 + 유저 존재 확인
   useEffect(() => {
-    setOffset(0);
-  }, [userid]);
+    console.log("[GuestUserHomePage] userid param =", userid);
 
-  // ✅ 목록 로딩을 함수로 빼두면 삭제 후 재조회하기 쉬움
+    setOffset(0);
+    setBulbs([]);
+    setHasNext(false);
+    setUserOk(null);
+
+    if (!userid) {
+      navigate("/404", { replace: true });
+      return;
+    }
+
+    let mounted = true;
+
+    (async () => {
+      try {
+        const ok = await checkUserExists(userid);
+        if (!mounted) return;
+
+        if (!ok) {
+          setUserOk(false); // ✅ 추가
+          navigate("/404", { replace: true });
+          return;
+        }
+        setUserOk(true);
+      } catch (e) {
+        console.error("checkUserExists failed:", e);
+        navigate("/error", { replace: true });
+      }
+    })();
+
+
+    return () => {
+      mounted = false;
+    };
+  }, [userid, navigate]);
+
+  // ✅ 목록 로딩 함수
   const fetchPage = async (opts?: { keepLoadingState?: boolean }) => {
     if (!userid) return;
+    if (userOk !== true) return;
 
     const keepLoadingState = opts?.keepLoadingState ?? false;
 
@@ -80,62 +113,25 @@ export default function GuestUserHomePage() {
       setBulbs(mapped);
       setHasNext(result.hasNext);
     } catch (e) {
+      if (axios.isAxiosError(e) && e.response?.status === 404) {
+        navigate("/404", { replace: true });
+        return;
+      }
       console.error("getUserLetters failed:", e);
     } finally {
       if (!keepLoadingState) setLoading(false);
     }
   };
 
-  // 현재 페이지(8개) 불러오기
+  // ✅ userOk가 true가 된 뒤 + offset 변경 시 목록 불러오기
   useEffect(() => {
-    if (!userid) return;
+    if (userOk !== true) return;
+    fetchPage();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userOk, offset, userid]);
 
-    let mounted = true;
-    (async () => {
-      try {
-        setLoading(true);
-
-        const result = await getUserLetters({
-          userid,
-          limit: PAGE_SIZE,
-          offset,
-        });
-
-        if (!mounted) return;
-
-        const mapped: BulbItem[] = result.items
-          .map((it) => {
-            const bulbKey = toBulbKey(it.ornament_shape, it.ornament_color);
-            if (!bulbKey) return null;
-
-            return {
-              id: String(it.letter_number),
-              bulbKey,
-              nickname: it.writer_nickname ?? "",
-            };
-          })
-          .filter(Boolean) as BulbItem[];
-
-        setBulbs(mapped);
-        setHasNext(result.hasNext);
-      } catch (e) {
-        console.error("getUserLetters failed:", e);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    })();
-
-    return () => {
-      mounted = false;
-    };
-  }, [userid, offset]);
-
-  // 페이지 표시
   const pageIndex = Math.floor(offset / PAGE_SIZE) + 1;
-  const pageCount = useMemo(
-    () => (hasNext ? pageIndex + 1 : pageIndex),
-    [hasNext, pageIndex]
-  );
+  const pageCount = useMemo(() => (hasNext ? pageIndex + 1 : pageIndex), [hasNext, pageIndex]);
 
   const onPrev = () => {
     if (!hasPrev || loading) return;
@@ -147,7 +143,6 @@ export default function GuestUserHomePage() {
     setOffset((v) => v + PAGE_SIZE);
   };
 
-  // ✅ 오너먼트 클릭: 무조건 수정/삭제 메뉴 띄우기 (읽기 잠금과 무관)
   const onOpenLetter = (id: string) => {
     const n = Number(id);
     if (!Number.isFinite(n)) return;
@@ -178,110 +173,80 @@ export default function GuestUserHomePage() {
     if (!/^\d{4}$/.test(pw)) return;
 
     try {
-        setConfirmLoading(true);
-        setPwError(null);
+      setConfirmLoading(true);
+      setPwError(null);
 
-        // ✅ 비번 검증(서버가 맞다 하면 성공)
-        await fetchLetterForEdit({
+      await fetchLetterForEdit({
         userid,
         letterNumber: selectedLetterNumber,
         password: pw,
-        });
+      });
 
-        // ✅ 성공한 경우에만 이동
-        navigate(`/users/${userid}/letters`, {
+      navigate(`/users/${userid}/letters`, {
         state: { mode: "edit", letterNumber: selectedLetterNumber, password: pw },
-        });
+      });
     } catch (e) {
-        // ✅ 틀리면 팝업 유지 + 메시지 표시
-        if (axios.isAxiosError(e)) {
+      if (axios.isAxiosError(e)) {
         const status = e.response?.status;
         if (status === 401 || status === 403) {
-            setPwError("비밀번호가 다릅니다.");
-            return;
+          setPwError("비밀번호가 다릅니다.");
+          return;
         }
-        }
-        setPwError("비밀번호 확인에 실패했어요. 잠시 후 다시 시도해주세요.");
+      }
+      setPwError("비밀번호 확인에 실패했어요. 잠시 후 다시 시도해주세요.");
     } finally {
-        setConfirmLoading(false);
+      setConfirmLoading(false);
     }
-    };
-
+  };
 
   const doDelete = async () => {
     if (!userid || !selectedLetterNumber) return;
     if (!/^\d{4}$/.test(pw)) return;
 
     try {
-        setConfirmLoading(true);
-        setPwError(null);
+      setConfirmLoading(true);
+      setPwError(null);
 
-        await deleteUserLetter({
+      await deleteUserLetter({
         userid,
         letterNumber: selectedLetterNumber,
         password: pw,
-        });
+      });
 
-        closeAll();
-        await fetchPage({ keepLoadingState: true });
+      closeAll();
+      await fetchPage({ keepLoadingState: true });
     } catch (e) {
-        if (axios.isAxiosError(e)) {
+      if (axios.isAxiosError(e)) {
         const status = e.response?.status;
         if (status === 401 || status === 403) {
-            setPwError("비밀번호가 다릅니다.");
-            return;
+          setPwError("비밀번호가 다릅니다.");
+          return;
         }
-        }
-        setPwError("삭제에 실패했어요. 잠시 후 다시 시도해주세요.");
+      }
+      setPwError("삭제에 실패했어요. 잠시 후 다시 시도해주세요.");
     } finally {
-        setConfirmLoading(false);
+      setConfirmLoading(false);
     }
-    };
-
+  };
 
   function ActionSheet({ open }: { open: boolean }) {
     if (!open) return null;
-
     return (
-      <div
-        className="fixed inset-0 z-[90] flex items-center justify-center bg-black/40 px-4"
-        onClick={closeAll} // 바깥 클릭하면 닫기
-      >
-        <div
-          className="w-[430px] max-w-[100vw] rounded-2xl bg-white shadow-xl"
-          onClick={(e) => e.stopPropagation()} // 모달 내부 클릭은 닫히지 않게
-        >
-          {/* header */}
+      <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/40 px-4" onClick={closeAll}>
+        <div className="w-[430px] max-w-[100vw] rounded-2xl bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
           <div className="flex items-center justify-between px-6 pt-5">
-            <div className="text-base font-bold text-neutral-900">
-              메시지를 변경하시겠습니까?
-            </div>
-            <button
-              type="button"
-              onClick={closeAll}
-              className="text-neutral-500 hover:text-neutral-800"
-              aria-label="닫기"
-            >
+            <div className="text-base font-bold text-neutral-900">메시지를 변경하시겠습니까?</div>
+            <button type="button" onClick={closeAll} className="text-neutral-500 hover:text-neutral-800" aria-label="닫기">
               ✕
             </button>
           </div>
 
-          {/* body */}
           <div className="px-6 pb-6 pt-4">
             <div className="mt-4 flex justify-center gap-3">
-              <button
-                type="button"
-                onClick={() => openConfirm("edit")}
-                className="text-base h-10 w-28 rounded-lg bg-neutral-800 text-white font-semibold"
-              >
+              <button type="button" onClick={() => openConfirm("edit")} className="text-base h-10 w-28 rounded-lg bg-neutral-800 text-white font-semibold">
                 수정
               </button>
-
-              <button
-                type="button"
-                onClick={() => openConfirm("delete")}
-                className="text-base h-10 w-28 rounded-lg bg-red-600 text-white font-semibold"
-              >
+              <button type="button" onClick={() => openConfirm("delete")} className="text-base h-10 w-28 rounded-lg bg-red-600 text-white font-semibold">
                 삭제
               </button>
             </div>
@@ -300,9 +265,7 @@ export default function GuestUserHomePage() {
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40">
         <div className="w-[360px] max-w-[90vw] rounded-2xl bg-white p-6 shadow-xl">
           <div className="text-lg font-extrabold text-neutral-900">{title}</div>
-          <div className="text-base mt-2 text-neutral-700">
-            비밀번호(숫자 4자리)를 입력해주세요.
-          </div>
+          <div className="text-base mt-2 text-neutral-700">비밀번호(숫자 4자리)를 입력해주세요.</div>
 
           <input
             autoFocus
@@ -310,23 +273,14 @@ export default function GuestUserHomePage() {
             value={pw}
             inputMode="numeric"
             placeholder="****"
-            onChange={(e) => setPw(e.target.value.replace(/\D/g, "").slice(0, 4))
-              
-            }
+            onChange={(e) => setPw(e.target.value.replace(/\D/g, "").slice(0, 4))}
           />
-          {pwError && (
-            <div className="mt-2 text-sm text-red-600">{pwError}</div>
-            )}
+          {pwError && <div className="mt-2 text-sm text-red-600">{pwError}</div>}
 
           <div className="mt-6 flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => setConfirmMode(null)}
-              className="text-base rounded-xl bg-neutral-200 px-4 py-2 font-semibold"
-            >
+            <button type="button" onClick={() => setConfirmMode(null)} className="text-base rounded-xl bg-neutral-200 px-4 py-2 font-semibold">
               취소
             </button>
-
             <button
               type="button"
               onClick={onConfirm}
@@ -348,30 +302,25 @@ export default function GuestUserHomePage() {
     navigate(`/users/${userid}/letters`);
   };
 
+  if (userOk === null) {
+    return <div className="min-h-screen bg-[#D8D1CE] flex items-center justify-center">로딩중...</div>;
+  }
+
   return (
     <div
       className="min-h-screen select-none caret-transparent bg-[#D8D1CE] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.6),transparent_45%)]"
       onDragStart={(e) => e.preventDefault()}
     >
       <div className="mx-auto max-w-[var(--layout-max-width)] px-[var(--layout-side-padding)] pt-8 pb-6">
-        {/* top bar */}
         <header className="flex items-center justify-between">
           <ServiceTitle className="text-neutral-900" />
-
           <HomeButton to="/" ariaLabel="메인으로" />
         </header>
 
-        {/* title section */}
         <WindowHeader className="mt-6" displayName={displayName} />
 
-        {/* window area */}
         <div className="mt-5">
-          <div
-            className="relative w-full overflow-hidden rounded-none shadow-none"
-            style={{
-              height: "min(62dvh, 720px)",
-            }}
-          >
+          <div className="relative w-full overflow-hidden rounded-none shadow-none" style={{ height: "min(62dvh, 720px)" }}>
             <div className="relative h-full w-full">
               <Scene>
                 <OrnamentLayer
@@ -385,17 +334,17 @@ export default function GuestUserHomePage() {
                   pageCount={pageCount}
                   onPrev={onPrev}
                   onNext={onNext}
-                  onOpenLetter={onOpenLetter} // ? ?? ??
+                  onOpenLetter={onOpenLetter}
                 />
               </Scene>
             </div>
           </div>
+
           <div className="mt-3 flex justify-center">
             <PageIndicator pageIndex={pageIndex} pageCount={pageCount} />
           </div>
         </div>
 
-        {/* bottom buttons */}
         <button
           type="button"
           onClick={goWriteLetter}
@@ -405,7 +354,6 @@ export default function GuestUserHomePage() {
         </button>
       </div>
 
-      {/* ✅ 모달들 */}
       <ActionSheet open={actionOpen} />
       {confirmMode && <ConfirmPasswordModal mode={confirmMode} />}
     </div>
