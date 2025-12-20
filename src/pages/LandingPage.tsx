@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import InfoButton from "../components/InfoButton";
+import windowMain from "../assets/scene/window_main.png";
 /**
  * 랜딩(처음) 화면:
  * - 오른쪽 위 i 버튼: hover(데스크탑) + 클릭(모바일) 모두 지원
@@ -68,18 +69,21 @@ export default function LandingPage() {
         </h1>
 
         {/* window area (이미지/컴포넌트로 교체) */}
-        <div className="mt-6 overflow-hidden rounded-2xl shadow-[0_10px_30px_rgba(0,0,0,0.18)]">
-          <div className="aspect-[3/4] w-full bg-black/10">
-            {/* TODO: 네 창문/전구 UI 컴포넌트를 여기 넣기 */}
-          </div>
-        </div>
+        <br/>
+        <br/>
+            <img
+              src={windowMain}
+              alt="window"
+              className="h-full w-full object-cover"
+            />
+          
 
         {/* login button bottom */}
         <button
           onClick={() => navigate("/login")}
           className="mt-8 h-14 w-full rounded-xl bg-[#8E2F2F] text-lg font-semibold text-white shadow-[0_10px_20px_rgba(0,0,0,0.18)]"
         >
-          로그인하기
+          로그인 하기
         </button>
       </div>
     </div>
