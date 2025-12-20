@@ -7,6 +7,8 @@ import { AuthLayout } from "../layouts/AuthLayout";
 import Input from "../components/ui/Input";
 import Label from "../components/ui/Label";
 import Button from "../components/ui/Button";
+import HomeButton from "../components/navigation/HomeButton";
+import ServiceTitle from "../components/common/ServiceTitle";
 
 import { useAuth } from "../contexts/AuthContext";
 
@@ -51,7 +53,15 @@ export default function LoginPage() {
   };
 
   return (
-    <AuthLayout title="로그인">
+    <AuthLayout
+      title="로그인"
+      headerSlot={
+        <header className="flex items-center justify-between">
+          <ServiceTitle className="text-neutral-900" />
+          <HomeButton to="/" ariaLabel="홈으로" />
+        </header>
+      }
+    >
       <form onSubmit={handleSubmit} className="space-y-8">
         <div className="space-y-2">
           <Label className="text-base font-medium">아이디</Label>

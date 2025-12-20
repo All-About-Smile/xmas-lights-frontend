@@ -17,7 +17,7 @@ export default function InfoButton({
       className={`grid h-9 w-9 place-items-center ${className ?? ""}`}
       {...buttonProps}
     >
-      <img src={infoIcon} alt="" className="h-5 w-5" />
+      <img src={infoIcon} alt="" className="h-7 w-7" />
     </button>
   );
 }
