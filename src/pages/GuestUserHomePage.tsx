@@ -14,6 +14,8 @@ import { deleteUserLetter, getUserLetters,fetchLetterForEdit } from "@/api/lette
 import { toBulbKey } from "@/utils/bulbKey";
 import HomeButton from "@/components/navigation/HomeButton";
 import PageIndicator from "@/components/common/PageIndicator";
+import ServiceTitle from "@/components/common/ServiceTitle";
+import WindowHeader from "@/components/common/WindowHeader";
 
 type ActionMode = "edit" | "delete";
 
@@ -351,23 +353,16 @@ export default function GuestUserHomePage() {
       className="min-h-screen select-none caret-transparent bg-[#D8D1CE] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.6),transparent_45%)]"
       onDragStart={(e) => e.preventDefault()}
     >
-      <div className="mx-auto max-w-[var(--layout-max-width)] px-[var(--layout-side-padding)] pt-4 pb-6">
+      <div className="mx-auto max-w-[var(--layout-max-width)] px-[var(--layout-side-padding)] pt-8 pb-6">
         {/* top bar */}
-        <header className="flex items-start justify-between">
-          <div className="text-sm font-medium text-neutral-800">밝혀줘! 내 X-mas 전구</div>
+        <header className="flex items-center justify-between">
+          <ServiceTitle className="text-neutral-900" />
 
           <HomeButton to="/" ariaLabel="메인으로" />
         </header>
 
         {/* title section */}
-        <div className="mt-6">
-          <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900">
-            {displayName} 님의 창문
-          </h1>
-
-          <div className="mt-3 text-sm text-neutral-700">🎄 올해까지 벌써 15일 남음...</div>
-          <div className="mt-1 text-sm text-neutral-700">지금당장 ❤️편할지 써야겠지?😳</div>
-        </div>
+        <WindowHeader className="mt-6" displayName={displayName} />
 
         {/* window area */}
         <div className="mt-5">
