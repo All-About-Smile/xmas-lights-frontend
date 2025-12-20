@@ -55,7 +55,7 @@ export default function LetterSheet({
           />
 
           {/* paper */}
-          <div className="relative mx-auto w-full rounded-2xl border border-neutral-700/40 bg-transparent">
+          <div className="relative mx-auto w-full rounded-2xl border border-[#CBBFAF] bg-[#F7F1E6]">
             <div className="p-6 pt-10">
               <div className="text-lg text-neutral-900">To. {toName}</div>
 
