@@ -85,11 +85,11 @@ export default function LoginPage() {
       </form>
 
       <div className="mt-10 space-y-2 text-center text-sm text-neutral-900">
-        <div className="space-x-2">
+        {/* <div className="space-x-2">
           <Link to="/account/find?mode=id">아이디 찾기</Link>
           <span>|</span>
           <Link to="/account/find?mode=password">비밀번호 찾기</Link>
-        </div>
+        </div> */}
         <div>
           <Link to="/register">회원가입</Link>
         </div>
