@@ -25,12 +25,12 @@ function LockedPopup({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40">
       <div className="w-[320px] rounded-2xl bg-white p-5 shadow">
         <div className="text-lg font-semibold">기다려주세요 🎄</div>
-        <div className="mt-2 text-sm text-gray-600">
+        <div className="mt-2 text-base text-gray-600">
           편지는 12/25 00:00에 열려요.
         </div>
         <button
           onClick={onClose}
-          className="mt-4 w-full rounded-xl bg-black px-4 py-2 text-white"
+          className="text-base mt-4 w-full rounded-xl bg-black px-4 py-2 text-white"
         >
           확인
         </button>
@@ -298,16 +298,6 @@ export default function HomePage() {
                   링크가 복사되었어요!
                 </div>
               )}
-
-              <div className="mt-4 flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => setOpenShare(false)}
-                  className="h-10 rounded-lg bg-neutral-200 px-4 text-sm font-semibold text-neutral-900"
-                >
-                  닫기
-                </button>
-              </div>
             </div>
           </div>
         </div>
