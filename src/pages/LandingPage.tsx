@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import InfoButton from "../components/InfoButton";
+import ServiceTitle from "../components/common/ServiceTitle";
 /**
  * 랜딩(처음) 화면:
  * - 오른쪽 위 i 버튼: hover(데스크탑) + 클릭(모바일) 모두 지원
@@ -23,12 +24,10 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#D8D1CE]">
-      <div className="mx-auto max-w-[var(--layout-max-width)] px-[var(--layout-side-padding)] pt-6 pb-10">
+      <div className="mx-auto max-w-[var(--layout-max-width)] px-[var(--layout-side-padding)] pt-8 pb-10">
         {/* top bar */}
-        <header className="flex items-start justify-between">
-          <div className="text-sm font-medium text-neutral-800">
-            밝혀줘! 내 X-mas 전구
-          </div>
+        <header className="flex items-center justify-between">
+          <ServiceTitle className="text-neutral-900" />
 
           {/* info button */}
           <div className="relative">
