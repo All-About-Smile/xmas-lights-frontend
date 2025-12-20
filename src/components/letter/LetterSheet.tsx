@@ -51,7 +51,7 @@ export default function LetterSheet({
           <img
             src={bulbSrc}
             alt=""
-            className="absolute left-1/2 -translate-x-1/2 -top-10 w-16 h-auto"
+            className="absolute left-1/2 -translate-x-1/2 -top-10 z-10 w-16 h-auto"
           />
 
           {/* paper */}
