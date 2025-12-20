@@ -44,7 +44,7 @@ export default function LandingPage() {
                 <li>창문을 밝혀줄 전구와 색상을 선택해 봐!</li>
                 <li>따뜻한 메시지로 마음을 전달해 보자~!</li>
               </ol>
-              <p>💌 로그인하지 않아도 편지 남길 수 있어! <span className="text-[#006F57] font-medium">(❁´◡`❁)</span></p>
+              <p>💌 로그인하지 않아도 편지 남길 수 있어! <div className="text-[#006F57] font-medium">(❁´◡`❁)</div></p>
               <br />
 
               <div className="font-semibold">🪟 창문 생성 방법 (회원가입)</div>
@@ -52,11 +52,7 @@ export default function LandingPage() {
                 <li>메인 페이지에서 “로그인하기” 버튼 클릭!</li>
                 <li>지인의 창문 페이지에서 “오른쪽 위에 사람” 버튼 클릭!</li>
               </ol>
-               <p>💌 작성한 메시지는 12월 25일에 공개될 거야~! <span className="text-[#006F57] font-medium">(ღˇᴗˇ)｡o♡</span></p>
-              
-               <div className="mt-3 text-xs text-neutral-600">
-                (모바일에서는 i 버튼을 한 번 더 누르면 닫혀요)
-              </div>
+               <p>💌 작성한 메시지는 12월 25일에 공개될 거야!<div className="text-[#006F57] font-medium">(ღˇᴗˇ)｡o♡</div></p>
             </div>
           </div>
         </header>
