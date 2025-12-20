@@ -48,6 +48,7 @@ function parseOpenAtFromEnv(year: number): Date | null {
   const groups = match?.groups as KstOpenAtGroups | undefined;
   if (!groups) return null;
 
+
   return toUtcFromKst(
     year,
     Number(groups.month),
@@ -56,6 +57,7 @@ function parseOpenAtFromEnv(year: number): Date | null {
     Number(groups.minute)
   );
 }
+
 
 function getOpenAtUTC(year: number): Date {
   const envOpen = parseOpenAtFromEnv(year);
@@ -80,3 +82,13 @@ export function toKoreanTime(date: Date): Date {
   const utcTime = date.getTime() + date.getTimezoneOffset() * 60000;
   return new Date(utcTime + KST_OFFSET_MINUTES * 60000);
 }
+
+
+export function getDaysUntilOpen(now: Date = new Date()): number {
+  const openAtUTC = getOpenAtUTC(now.getUTCFullYear());
+  const diffMs = openAtUTC.getTime() - now.getTime();
+  if (diffMs <= 0) return 0;
+
+  return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+}
+

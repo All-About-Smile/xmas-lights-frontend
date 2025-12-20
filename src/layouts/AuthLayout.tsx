@@ -1,30 +1,23 @@
 // src/layouts/AuthLayout.tsx
 import type { ReactNode } from "react";
-import HomeButton from "@/components/navigation/HomeButton";
 
 interface AuthLayoutProps {
   title: string;
   children: ReactNode;
+  headerSlot?: ReactNode;
 }
 
-export function AuthLayout({ title, children }: AuthLayoutProps) {
+export function AuthLayout({ title, children, headerSlot }: AuthLayoutProps) {
   return (
     <div className="min-h-screen bg-[#FBF4DD] text-neutral-900">
-      <div className="mx-auto flex min-h-screen max-w-md flex-col px-6 pb-16 pt-8">
-        {/* 상단 로고 + 홈 버튼 */}
-        <header className="mb-20 flex items-center justify-between">
-          <span className="text-sm font-medium">밝혀줘! 내 X-mas 전구</span>
-
-          <HomeButton
-            to="/"
-            ariaLabel="홈으로"
-          />
-        </header>
-
+      <div className="mx-auto flex min-h-screen max-w-[var(--layout-max-width)] flex-col px-[var(--layout-side-padding)] pb-16 pt-8">
         {/* 본문 */}
         <main className="flex-1">
-          <h1 className="mb-12 text-3xl font-semibold tracking-tight">{title}</h1>
-          {children}
+          {headerSlot ? <div className="mb-20">{headerSlot}</div> : null}
+          <div className="mx-auto w-full max-w-md">
+            <h1 className="mb-12 text-3xl font-semibold tracking-tight">{title}</h1>
+            {children}
+          </div>
         </main>
       </div>
     </div>
