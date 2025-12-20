@@ -59,13 +59,13 @@ export default function SideDrawer({ open, onClose }: SideDrawerProps) {
 
         {/* menu */}
         <nav className="px-6 py-6 text-lg font-medium text-neutral-900">
-          <Link
+          {/* <Link
             to="/account/settings"
             className="block py-4"
             onClick={onClose}
           >
             계정 설정
-          </Link>
+          </Link> */}
 
           <Link
             to="/"

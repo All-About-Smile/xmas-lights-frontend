@@ -353,9 +353,15 @@ export default function WriteLetterPage() {
               <div className="select-none caret-transparent w-20 font-semibold">from.</div>
               <input
                 className="h-11 flex-1 rounded-lg bg-white/35 px-3 text-base outline-none ring-1 ring-neutral-500/30 focus:ring-2 focus:ring-[#8E2F2F]"
-                placeholder="닉네임"
+                placeholder="닉네임(최대 7자)"
                 value={writerNickname}
-                onChange={(e) => setWriterNickname(e.target.value)}
+                maxLength={7} 
+                onChange={(e) =>{ 
+                  const value = e.target.value;
+                  if (value.length <= 7) {
+                    setWriterNickname(value);
+                }
+              }}
               />
             </div>
           </div>
