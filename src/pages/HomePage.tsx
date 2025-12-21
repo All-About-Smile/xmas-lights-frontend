@@ -194,9 +194,10 @@ export default function HomePage() {
 
   return (
     <div
-      className="min-h-screen select-none caret-transparent bg-[#D8D1CE] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.6),transparent_45%)]"
+      className="min-h-[100svh] select-none caret-transparent"
       onDragStart={(e) => e.preventDefault()}
     >
+      <div className="fixed inset-0 -z-10 bg-[#D8D1CE] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.6),transparent_45%)]" />
       <div className="mx-auto max-w-[var(--layout-max-width)] px-[var(--layout-side-padding)] pt-8 pb-6">
         {/* top bar */}
         <header className="flex items-center justify-between">

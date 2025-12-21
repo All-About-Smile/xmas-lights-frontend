@@ -415,7 +415,7 @@ export default function WriteLetterPage() {
             disabled={submitting || content.trim().length === 0}
             className="h-14 w-full rounded-xl bg-[#8E2F2F] text-lg font-semibold text-white disabled:opacity-40"
           >
-            {submitting ? "저장 중..." : isEdit ? "수정 저장하기" : "저장하기"}
+            {submitting ? "저장 중..." : isEdit ? "수정하기" : "저장하기"}
           </button>
         }
       />

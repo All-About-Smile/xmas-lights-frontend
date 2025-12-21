@@ -82,7 +82,7 @@ export default function LoginPage() {
           />
         </div>
 
-        {errorMsg && <p className="text-sm text-red-600">{errorMsg}</p>}
+        {errorMsg && <p className="text-base text-red-600">{errorMsg}</p>}
 
         <div className="pt-4">
           <Button
@@ -94,7 +94,7 @@ export default function LoginPage() {
         </div>
       </form>
 
-      <div className="mt-10 space-y-2 text-center text-sm text-neutral-900">
+      <div className="mt-10 space-y-2 text-center text-base text-neutral-900">
         {/* <div className="space-x-2">
           <Link to="/account/find?mode=id">아이디 찾기</Link>
           <span>|</span>
