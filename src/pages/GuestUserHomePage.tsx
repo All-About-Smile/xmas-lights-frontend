@@ -10,7 +10,11 @@ import { SLOTS, PAGE_SIZE } from "@/components/scene/sceneSlots";
 import { BULB_IMAGES } from "@/components/scene/bulbImages";
 import type { BulbItem } from "@/components/scene/types";
 
-import { deleteUserLetter, getUserLetters, fetchLetterForEdit } from "@/api/letterApi";
+import {
+  deleteUserLetter,
+  getUserLetters,
+  fetchLetterForEdit,
+} from "@/api/letterApi";
 import { checkUserExists } from "@/api/userApi";
 import { toBulbKey } from "@/utils/bulbKey";
 import HomeButton from "@/components/navigation/HomeButton";
@@ -18,11 +22,17 @@ import PageIndicator from "@/components/common/PageIndicator";
 import ServiceTitle from "@/components/common/ServiceTitle";
 import WindowHeader from "@/components/common/WindowHeader";
 
+// ✅ 추가: GateContext
+import { useGate } from "@/contexts/GateContext";
+
 type ActionMode = "edit" | "delete";
 
 export default function GuestUserHomePage() {
   const navigate = useNavigate();
   const { userid } = useParams<{ userid: string }>();
+
+  // ✅ 추가: serverDate 저장 + 잠금 플래그
+  const { setServerDate, isWriteLocked } = useGate();
 
   const [offset, setOffset] = useState(0);
 
@@ -35,7 +45,9 @@ export default function GuestUserHomePage() {
 
   const hasPrev = offset > 0;
 
-  const [selectedLetterNumber, setSelectedLetterNumber] = useState<number | null>(null);
+  const [selectedLetterNumber, setSelectedLetterNumber] = useState<number | null>(
+    null
+  );
   const [actionOpen, setActionOpen] = useState(false);
   const [confirmMode, setConfirmMode] = useState<null | ActionMode>(null);
   const [pw, setPw] = useState("");
@@ -75,7 +87,6 @@ export default function GuestUserHomePage() {
       }
     })();
 
-
     return () => {
       mounted = false;
     };
@@ -96,6 +107,14 @@ export default function GuestUserHomePage() {
         limit: PAGE_SIZE,
         offset,
       });
+
+      // ✅ 추가: serverDate를 GateContext에 저장 (안전 파싱)
+      if (result.serverDate) {
+        const d = new Date(result.serverDate as any);
+        setServerDate(Number.isNaN(d.getTime()) ? null : d);
+      } else {
+        setServerDate(null);
+      }
 
       const mapped: BulbItem[] = result.items
         .map((it) => {
@@ -131,7 +150,10 @@ export default function GuestUserHomePage() {
   }, [userOk, offset, userid]);
 
   const pageIndex = Math.floor(offset / PAGE_SIZE) + 1;
-  const pageCount = useMemo(() => (hasNext ? pageIndex + 1 : pageIndex), [hasNext, pageIndex]);
+  const pageCount = useMemo(
+    () => (hasNext ? pageIndex + 1 : pageIndex),
+    [hasNext, pageIndex]
+  );
 
   const onPrev = () => {
     if (!hasPrev || loading) return;
@@ -144,6 +166,9 @@ export default function GuestUserHomePage() {
   };
 
   const onOpenLetter = (id: string) => {
+    // ✅ 추가: 25일 이후 전구(오너먼트) 클릭 자체 막기
+    if (isWriteLocked) return;
+
     const n = Number(id);
     if (!Number.isFinite(n)) return;
 
@@ -231,22 +256,47 @@ export default function GuestUserHomePage() {
 
   function ActionSheet({ open }: { open: boolean }) {
     if (!open) return null;
+
+    // ✅ 추가: 25일 이후 수정/삭제 UI 자체 숨김
+    if (isWriteLocked) return null;
+
     return (
-      <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/40 px-4" onClick={closeAll}>
-        <div className="w-[430px] max-w-[100vw] rounded-2xl bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="fixed inset-0 z-[90] flex items-center justify-center bg-black/40 px-4"
+        onClick={closeAll}
+      >
+        <div
+          className="w-[430px] max-w-[100vw] rounded-2xl bg-white shadow-xl"
+          onClick={(e) => e.stopPropagation()}
+        >
           <div className="flex items-center justify-between px-6 pt-5">
-            <div className="text-base font-bold text-neutral-900">메시지를 변경하시겠습니까?</div>
-            <button type="button" onClick={closeAll} className="text-neutral-500 hover:text-neutral-800" aria-label="닫기">
+            <div className="text-base font-bold text-neutral-900">
+              메시지를 변경하시겠습니까?
+            </div>
+            <button
+              type="button"
+              onClick={closeAll}
+              className="text-neutral-500 hover:text-neutral-800"
+              aria-label="닫기"
+            >
               ✕
             </button>
           </div>
 
           <div className="px-6 pb-6 pt-4">
             <div className="mt-4 flex justify-center gap-3">
-              <button type="button" onClick={() => openConfirm("edit")} className="text-base h-10 w-28 rounded-lg bg-neutral-800 text-white font-semibold">
+              <button
+                type="button"
+                onClick={() => openConfirm("edit")}
+                className="text-base h-10 w-28 rounded-lg bg-neutral-800 text-white font-semibold"
+              >
                 수정
               </button>
-              <button type="button" onClick={() => openConfirm("delete")} className="text-base h-10 w-28 rounded-lg bg-red-600 text-white font-semibold">
+              <button
+                type="button"
+                onClick={() => openConfirm("delete")}
+                className="text-base h-10 w-28 rounded-lg bg-red-600 text-white font-semibold"
+              >
                 삭제
               </button>
             </div>
@@ -257,6 +307,9 @@ export default function GuestUserHomePage() {
   }
 
   function ConfirmPasswordModal({ mode }: { mode: ActionMode }) {
+    // ✅ 추가: 25일 이후 모달 자체도 숨김(안전)
+    if (isWriteLocked) return null;
+
     const title = mode === "edit" ? "정말 수정 하시겠습니까?" : "정말 삭제 하시겠습니까?";
     const btnText = mode === "edit" ? "수정" : "삭제";
     const onConfirm = mode === "edit" ? goEdit : doDelete;
@@ -265,7 +318,9 @@ export default function GuestUserHomePage() {
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40">
         <div className="w-[360px] max-w-[90vw] rounded-2xl bg-white p-6 shadow-xl">
           <div className="text-lg font-extrabold text-neutral-900">{title}</div>
-          <div className="text-base mt-2 text-neutral-700">비밀번호(숫자 4자리)를 입력해주세요.</div>
+          <div className="text-base mt-2 text-neutral-700">
+            비밀번호(숫자 4자리)를 입력해주세요.
+          </div>
 
           <input
             autoFocus
@@ -278,7 +333,11 @@ export default function GuestUserHomePage() {
           {pwError && <div className="mt-2 text-sm text-red-600">{pwError}</div>}
 
           <div className="mt-6 flex justify-end gap-3">
-            <button type="button" onClick={() => setConfirmMode(null)} className="text-base rounded-xl bg-neutral-200 px-4 py-2 font-semibold">
+            <button
+              type="button"
+              onClick={() => setConfirmMode(null)}
+              className="text-base rounded-xl bg-neutral-200 px-4 py-2 font-semibold"
+            >
               취소
             </button>
             <button
@@ -299,11 +358,19 @@ export default function GuestUserHomePage() {
 
   const goWriteLetter = () => {
     if (!userid) return;
+
+    // ✅ 추가: 25일 이후 작성 페이지 이동 막기
+    if (isWriteLocked) return;
+
     navigate(`/users/${userid}/letters`);
   };
 
   if (userOk === null) {
-    return <div className="min-h-screen bg-[#D8D1CE] flex items-center justify-center">로딩중...</div>;
+    return (
+      <div className="min-h-screen bg-[#D8D1CE] flex items-center justify-center">
+        로딩중...
+      </div>
+    );
   }
 
   return (
@@ -320,7 +387,10 @@ export default function GuestUserHomePage() {
         <WindowHeader className="mt-6" displayName={displayName} />
 
         <div className="mt-5">
-          <div className="relative w-full overflow-hidden rounded-none shadow-none" style={{ height: "min(62dvh, 720px)" }}>
+          <div
+            className="relative w-full overflow-hidden rounded-none shadow-none"
+            style={{ height: "min(62dvh, 720px)" }}
+          >
             <div className="relative h-full w-full">
               <Scene>
                 <OrnamentLayer
@@ -348,7 +418,8 @@ export default function GuestUserHomePage() {
         <button
           type="button"
           onClick={goWriteLetter}
-          className="mt-8 h-14 w-full rounded-xl bg-[#8E2F2F] text-lg font-semibold text-white shadow-[0_10px_20px_rgba(0,0,0,0.18)]"
+          disabled={isWriteLocked}
+          className="mt-8 h-14 w-full rounded-xl bg-[#8E2F2F] text-lg font-semibold text-white shadow-[0_10px_20px_rgba(0,0,0,0.18)] disabled:opacity-40 disabled:cursor-not-allowed"
         >
           창문 꾸미기
         </button>
