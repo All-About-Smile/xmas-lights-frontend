@@ -116,7 +116,7 @@ function RegisterPage() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="4자+영문+숫자"
+            placeholder="4자 이상+영문+숫자"
             autoComplete="new-password"
             className="h-14 rounded-xl border-none bg-[#F8EFD4] shadow-[0_4px_10px_rgba(0,0,0,0.08)]"
           />
