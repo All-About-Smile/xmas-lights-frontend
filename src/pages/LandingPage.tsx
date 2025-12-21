@@ -53,10 +53,10 @@ export default function LandingPage() {
 
               <div className="font-semibold">🪟 창문 생성 방법 (회원가입)</div>
               <ol className="mt-2 list-decimal space-y-1 pl-5 leading-5">
-                <li>메인 페이지에서 “로그인하기” 버튼 클릭!</li>
-                <li>지인의 창문 페이지에서 “오른쪽 위에 사람” 버튼 클릭!</li>
+                <li>메인 페이지에서 “로그인하기” 버튼 클릭! 또는</li>
+                <li>지인의 창문 페이지에서 “홈” 버튼 클릭!</li>
               </ol>
-               <p>💌 작성한 메시지는 12월 25일에 공개될 거야!<div className="text-[#006F57] font-medium">(ღˇᴗˇ)｡o♡</div></p>
+               <p>💌 작성한 메시지는 12월 25일에 공개될 거야!<div className="text-[#BB010B] font-medium">(ღˇᴗˇ)｡o♡</div></p>
             </div>
           </div>
         </header>
