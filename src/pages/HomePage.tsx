@@ -18,7 +18,8 @@ import MenuButton from "@/components/navigation/MenuButton";
 import ServiceTitle from "@/components/common/ServiceTitle";
 import WindowHeader from "@/components/common/WindowHeader";
 
-
+// ✅ 추가: GateContext
+import { useGate } from "@/contexts/GateContext";
 
 function LockedPopup({ onClose }: { onClose: () => void }) {
   return (
@@ -39,10 +40,12 @@ function LockedPopup({ onClose }: { onClose: () => void }) {
   );
 }
 
-
 export default function HomePage() {
   const navigate = useNavigate();
   const { user, isAuthenticated, isLoading } = useAuth();
+
+  // ✅ GateContext에서 serverDate 읽고/저장
+  const { serverDate, setServerDate } = useGate();
 
   // ✅ 문자열 userid 사용 (백엔드가 문자열로 받는다고 했으니)
   const userid = (user as any)?.userid as string | undefined;
@@ -56,9 +59,6 @@ export default function HomePage() {
   const [bulbs, setBulbs] = useState<BulbItem[]>([]);
   const [hasNext, setHasNext] = useState(false);
 
-  // 서버 Date 헤더(잠금 판정용)
-  const [serverDate, setServerDate] = useState<Date | null>(null);
-
   const [loading, setLoading] = useState(false);
   const [showLockedPopup, setShowLockedPopup] = useState(false);
 
@@ -71,7 +71,6 @@ export default function HomePage() {
     if (!userid) return "";
     return `${window.location.origin}/users/${encodeURIComponent(userid)}`;
   }, [userid]);
-
 
   const copyShareUrl = async () => {
     try {
@@ -90,8 +89,6 @@ export default function HomePage() {
       setTimeout(() => setCopied(false), 1200);
     }
   };
-
-
 
   const displayName = useMemo(() => {
     // user에 닉네임이 있으면 우선 사용, 없으면 userid로 대체
@@ -120,17 +117,13 @@ export default function HomePage() {
           limit: PAGE_SIZE,
           offset,
         });
-        
-        
 
         if (!mounted) return;
 
         const mapped: BulbItem[] = result.items
           .map((it) => {
             const bulbKey = toBulbKey(it.ornament_shape, it.ornament_color);
-            
             if (!bulbKey) return null;
-          
 
             return {
               id: String(it.letter_number),
@@ -142,30 +135,31 @@ export default function HomePage() {
 
         setBulbs(mapped);
         setHasNext(result.hasNext);
-        // console.log("bulbs mapped:", mapped);
 
-        if (result.serverDate) setServerDate(result.serverDate);
+        // ✅ serverDate는 GateContext에 저장 (안전 파싱)
+        if (result.serverDate) {
+          const d = new Date(result.serverDate as any);
+          setServerDate(Number.isNaN(d.getTime()) ? null : d);
+        } else {
+          setServerDate(null);
+        }
       } catch (e) {
         console.error("getUserLetters failed:", e);
       } finally {
         if (mounted) setLoading(false);
       }
-      
     })();
 
     return () => {
       mounted = false;
     };
-  }, [isLoading, isAuthenticated, userid, offset]);
+  }, [isLoading, isAuthenticated, userid, offset, setServerDate]);
 
-  // 서버 시간 기준으로 열림 여부
+  // 서버 시간 기준으로 "편지 열림" 여부 (12/25 00:00 이후 true)
   const unlocked = useMemo(() => {
     if (!serverDate) return false;
     return isUnlockedByServerDate(serverDate);
-
-
   }, [serverDate]);
-  
 
   // 페이지 표시는 총 개수 없으니 최소 추정 (hasNext면 +1)
   const pageIndex = Math.floor(offset / PAGE_SIZE) + 1;
@@ -202,8 +196,6 @@ export default function HomePage() {
         {/* top bar */}
         <header className="flex items-center justify-between">
           <ServiceTitle className="text-neutral-900" />
-
-          {/* hamburger */}
           <MenuButton onClick={() => setDrawerOpen(true)} ariaLabel="메뉴 열기" />
         </header>
 
@@ -303,7 +295,6 @@ export default function HomePage() {
           </div>
         </div>
       )}
-
     </div>
   );
 }

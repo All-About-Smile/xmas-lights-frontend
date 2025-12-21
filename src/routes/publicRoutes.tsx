@@ -8,6 +8,7 @@ import FindAccountPage from "../pages/FindAccountPage";
 import GuestUserHomePage from "@/pages/GuestUserHomePage";
 import NotFoundPage from "@/pages/NotFoundPage";
 import WriteLetterPage from "@/pages/WriteLetterPage";
+import WriteLockGuard from "./WriteLockGuard";
 
 export function publicRoutes(isAuthenticated: boolean): RouteObject[] {
   return [
@@ -33,7 +34,11 @@ export function publicRoutes(isAuthenticated: boolean): RouteObject[] {
     },
     { 
       path: "/users/:userid/letters",
-       element: <WriteLetterPage /> 
+      element: (
+      <WriteLockGuard>
+        <WriteLetterPage />
+      </WriteLockGuard>
+    ),
     },
      { 
       path: "/404",
