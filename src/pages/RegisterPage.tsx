@@ -156,7 +156,7 @@ function RegisterPage() {
           </Button>
         </div>
 
-        <div className="text-center text-sm text-neutral-900">
+        <div className="text-center text-base text-neutral-900">
           이미 계정이 있어? <Link to="/login">로그인</Link>
         </div>
       </form>
