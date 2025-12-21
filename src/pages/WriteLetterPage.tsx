@@ -110,8 +110,11 @@ export default function WriteLetterPage() {
   const location = useLocation();
   const navState = location.state as EditNavState;
 
-  const isEdit = navState?.mode === "edit";
-  const editLetterNumber = isEdit ? navState!.letterNumber : null;
+  const [editContext, setEditContext] = useState<EditNavState>(navState);
+
+  const isEdit = editContext?.mode === "edit";
+  const editLetterNumber = isEdit ? editContext!.letterNumber : null;
+  const editPassword = isEdit ? editContext!.password : null;
 
   const [step, setStep] = useState<Step>(1);
 
@@ -130,6 +133,13 @@ export default function WriteLetterPage() {
   // edit loading guard
   const [editLoaded, setEditLoaded] = useState(false);
   const [editLoading, setEditLoading] = useState(false);
+  const [hasDraft, setHasDraft] = useState(false);
+  const [draftChecked, setDraftChecked] = useState(false);
+
+  const draftKey = useMemo(() => {
+    if (!userid) return null;
+    return `writeLetterDraft:${userid}`;
+  }, [userid]);
 
   // ✅ useMemo도 hook이므로 항상 실행되게 위치 고정
   const bulbSrc = useMemo(() => {
@@ -156,9 +166,169 @@ export default function WriteLetterPage() {
     );
   }, [isEdit, ornamentShape, ornamentColor, writerNickname, passwordForEdit, bulbSrc]);
 
+  useEffect(() => {
+    if (navState?.mode === "edit") {
+      setEditContext(navState);
+    }
+  }, [navState]);
+
+  useEffect(() => {
+    if (!draftKey || navState?.mode !== "edit") return;
+
+    const existingRaw = localStorage.getItem(draftKey);
+    if (existingRaw) {
+      try {
+        const existing = JSON.parse(existingRaw) as {
+          mode?: "edit";
+          letterNumber?: number;
+        };
+        if (
+          existing.mode === "edit" &&
+          existing.letterNumber === navState.letterNumber
+        ) {
+          return;
+        }
+      } catch {
+        localStorage.removeItem(draftKey);
+      }
+    }
+
+    const editSeed = {
+      mode: "edit" as const,
+      letterNumber: navState.letterNumber,
+      password: navState.password,
+    };
+
+    try {
+      localStorage.setItem(draftKey, JSON.stringify(editSeed));
+    } catch (e) {
+      console.error("Failed to seed edit draft:", e);
+    }
+  }, [draftKey, navState]);
+
+  useEffect(() => {
+    if (!draftKey || !userid) return;
+
+    let raw = localStorage.getItem(draftKey);
+    if (!raw) {
+      const legacyPrefix = `writeLetterDraft:${userid}:`;
+      const legacyKey = Object.keys(localStorage).find((key) =>
+        key.startsWith(legacyPrefix),
+      );
+
+      if (legacyKey) {
+        raw = localStorage.getItem(legacyKey);
+        if (raw) {
+          localStorage.removeItem(legacyKey);
+          localStorage.setItem(draftKey, raw);
+        }
+      }
+    }
+
+    if (!raw) {
+      setDraftChecked(true);
+      return;
+    }
+
+    try {
+      const draft = JSON.parse(raw) as {
+        mode?: "edit";
+        letterNumber?: number;
+        password?: string;
+        step?: Step;
+        ornamentShape?: string;
+        ornamentColor?: string;
+        writerNickname?: string;
+        passwordForEdit?: string;
+        content?: string;
+      };
+
+      if (draft.mode === "edit" && draft.letterNumber && draft.password) {
+        setEditContext({
+          mode: "edit",
+          letterNumber: draft.letterNumber,
+          password: draft.password,
+        });
+      }
+
+      if (draft.ornamentShape) setOrnamentShape(draft.ornamentShape);
+      if (draft.ornamentColor) setOrnamentColor(draft.ornamentColor);
+      if (draft.writerNickname) setWriterNickname(draft.writerNickname);
+      if (draft.passwordForEdit) setPasswordForEdit(draft.passwordForEdit);
+      if (draft.content) setContent(draft.content);
+      if (draft.step === 1 || draft.step === 2) setStep(draft.step);
+
+      const hasDraftData =
+        !!draft.ornamentShape ||
+        !!draft.ornamentColor ||
+        !!draft.writerNickname ||
+        !!draft.passwordForEdit ||
+        !!draft.content;
+
+      if (hasDraftData) {
+        setHasDraft(true);
+        setEditLoaded(true);
+        setEditLoading(false);
+      }
+    } catch (e) {
+      console.error("Failed to parse draft:", e);
+      localStorage.removeItem(draftKey);
+    } finally {
+      setDraftChecked(true);
+    }
+  }, [draftKey, userid]);
+
+  useEffect(() => {
+    if (!draftKey || !editLoaded || !draftChecked) return;
+
+    const hasData =
+      isEdit ||
+      !!ornamentShape ||
+      !!ornamentColor ||
+      !!writerNickname ||
+      !!passwordForEdit ||
+      !!content;
+
+    if (!hasData) {
+      localStorage.removeItem(draftKey);
+      return;
+    }
+
+    const draft = {
+      mode: isEdit ? "edit" : undefined,
+      letterNumber: isEdit ? editLetterNumber ?? undefined : undefined,
+      password: isEdit ? editPassword ?? undefined : undefined,
+      step,
+      ornamentShape,
+      ornamentColor,
+      writerNickname,
+      passwordForEdit,
+      content,
+    };
+
+    try {
+      localStorage.setItem(draftKey, JSON.stringify(draft));
+    } catch (e) {
+      console.error("Failed to save draft:", e);
+    }
+  }, [
+    draftKey,
+    editLoaded,
+    draftChecked,
+    isEdit,
+    editLetterNumber,
+    editPassword,
+    step,
+    ornamentShape,
+    ornamentColor,
+    writerNickname,
+    passwordForEdit,
+    content,
+  ]);
+
   // ✅ edit 진입 처리
   useEffect(() => {
-    if (!userid) return;
+    if (!userid || !draftChecked) return;
 
     // edit 아닌 경우: 로딩 가드 해제
     if (!isEdit || !editLetterNumber) {
@@ -169,6 +339,18 @@ export default function WriteLetterPage() {
 
     let mounted = true;
 
+    if (hasDraft) {
+      setEditLoaded(true);
+      setEditLoading(false);
+      return;
+    }
+
+    if (!editPassword) {
+      console.error("Missing edit password in state.");
+      navigate(-1);
+      return;
+    }
+
     setEditLoading(true);
     setEditLoaded(false);
 
@@ -177,7 +359,7 @@ export default function WriteLetterPage() {
         const res = await fetchLetterForEdit({
           userid,
           letterNumber: editLetterNumber,
-          password: navState!.password,
+          password: editPassword,
         });
 
         if (!mounted) return;
@@ -188,7 +370,7 @@ export default function WriteLetterPage() {
         setContent(res.content ?? "");
 
         // 비번 수정 불가: state에만 보관
-        setPasswordForEdit(navState!.password);
+        setPasswordForEdit(editPassword);
 
         // 수정 진입 시 step2부터
         setStep(2);
@@ -205,7 +387,7 @@ export default function WriteLetterPage() {
     return () => {
       mounted = false;
     };
-  }, [userid, isEdit, editLetterNumber, navState, navigate]);
+  }, [userid, draftChecked, isEdit, editLetterNumber, editPassword, hasDraft, navigate]);
 
   const onNext = () => {
     if (!canGoNext) return;
@@ -245,6 +427,9 @@ export default function WriteLetterPage() {
         });
       }
 
+      if (draftKey) {
+        localStorage.removeItem(draftKey);
+      }
       navigate(`/users/${userid}`);
     } catch (e) {
       console.error("save failed:", e);
