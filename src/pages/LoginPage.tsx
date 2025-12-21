@@ -82,7 +82,7 @@ export default function LoginPage() {
           />
         </div>
 
-        {errorMsg && <p className="text-sm text-red-600">{errorMsg}</p>}
+        {errorMsg && <p className="text-base text-red-600">{errorMsg}</p>}
 
         <div className="pt-4">
           <Button
