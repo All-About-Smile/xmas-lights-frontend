@@ -126,7 +126,7 @@ function RegisterPage() {
       console.error("REGISTER ERROR:", err);
 
       const status = err?.response?.status;
-      if (status === 409) setErrorMsg("이미 존재하는 아이디/이메일이야.");
+      if (status === 400) setErrorMsg("이미 존재하는 아이디/이메일이야.");
       else if (status === 422) setErrorMsg("입력값 형식이 올바르지 않아(422).");
       else setErrorMsg("회원가입에 실패했어. 서버/네트워크를 확인해줘.");
     } finally {
