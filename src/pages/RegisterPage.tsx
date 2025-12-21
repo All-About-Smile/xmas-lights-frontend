@@ -12,6 +12,41 @@ import ServiceTitle from "../components/common/ServiceTitle";
 
 import { authApi } from "../api/authApi";
 
+function RegisterSuccessModal({
+  open,
+  onConfirm,
+}: {
+  open: boolean;
+  onConfirm: () => void;
+}) {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/40">
+      <div
+        className="w-[360px] max-w-[90vw] rounded-2xl bg-white p-6 shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="text-2xl font-extrabold text-neutral-900">
+          회원가입 완료
+        </div>
+        <div className="mt-2 text-lg text-neutral-700">
+          회원가입이 완료되었습니다!
+        </div>
+        <div className="mt-6 flex justify-end">
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="rounded-xl bg-[#4B6B12] px-4 py-2 text-xl font-semibold text-white shadow"
+          >
+            로그인 하러가기
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function RegisterPage() {
   const navigate = useNavigate();
 
@@ -22,6 +57,7 @@ function RegisterPage() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   // ✅ 유효성 검사 정규식
 
@@ -82,10 +118,10 @@ function RegisterPage() {
         email,
         password,
       });
-      alert("회원가입이 완료되었습니다!");
+      setShowSuccessModal(true);
 
       // ✅ 가입 성공 → 로그인 페이지로 이동
-      navigate("/login", { replace: true });
+      // 로그인 이동은 모달 확인 후 진행
     } catch (err: any) {
       console.error("REGISTER ERROR:", err);
 
@@ -108,6 +144,10 @@ function RegisterPage() {
         </header>
       }
     >
+      <RegisterSuccessModal
+        open={showSuccessModal}
+        onConfirm={() => navigate("/login", { replace: true })}
+      />
       <form onSubmit={handleSubmit} className="space-y-8">
         <div className="space-y-2">
           <Label className="text-base font-medium">아이디</Label>
