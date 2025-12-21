@@ -16,7 +16,7 @@ import { getUserLetters } from "../api/letterApi";
 import { isUnlockedByServerDate } from "../utils/time";
 import MenuButton from "@/components/navigation/MenuButton";
 import ServiceTitle from "@/components/common/ServiceTitle";
-import WindowHeader from "@/components/common/WindowHeader";
+import HomeWindowHeader from "@/components/common/HomeWindowHeader";
 
 
 
@@ -208,7 +208,7 @@ export default function HomePage() {
         </header>
 
         {/* title section */}
-        <WindowHeader className="mt-6" displayName={displayName} />
+        <HomeWindowHeader className="mt-6" displayName={displayName} />
 
         {/* window area */}
         <div className="mt-5">
