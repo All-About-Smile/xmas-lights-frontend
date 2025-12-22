@@ -120,6 +120,13 @@ export default function WriteLetterPage() {
   const location = useLocation();
   const navState = location.state as NavState;
 
+  useEffect(() => {
+    document.body.classList.add("allow-scroll");
+    return () => {
+      document.body.classList.remove("allow-scroll");
+    };
+  }, []);
+
   const [editContext, setEditContext] = useState<EditNavState>(
     navState?.mode === "edit" ? navState : undefined,
   );
@@ -162,6 +169,28 @@ export default function WriteLetterPage() {
   }, [userid, isEdit, editLetterNumber]);
 
   const prevDraftKeyRef = useRef<string | null>(null);
+  const entryCheckedRef = useRef(false);
+
+  useEffect(() => {
+    if (!userid || entryCheckedRef.current) return;
+
+    const navEntries = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[];
+    const isReload =
+      navEntries?.[0]?.type === "reload" ||
+      (performance as any).navigation?.type === 1;
+
+    if (!isReload) {
+      const legacySingle = `writeLetterDraft:${userid}`;
+      const prefix = `writeLetterDraft:${userid}:`;
+
+      sessionStorage.removeItem(legacySingle);
+      Object.keys(sessionStorage).forEach((key) => {
+        if (key.startsWith(prefix)) sessionStorage.removeItem(key);
+      });
+    }
+
+    entryCheckedRef.current = true;
+  }, [userid]);
 
   // ✅ useMemo도 hook이므로 항상 실행되게 위치 고정
   const bulbSrc = useMemo(() => {
@@ -199,7 +228,7 @@ export default function WriteLetterPage() {
           letterNumber: navState.letterNumber,
           password: navState.password,
         };
-        localStorage.setItem(activeKey, JSON.stringify(nextActive));
+        sessionStorage.setItem(activeKey, JSON.stringify(nextActive));
       }
       return;
     }
@@ -207,14 +236,14 @@ export default function WriteLetterPage() {
     if (navState?.mode === "write") {
       setEditContext(undefined);
       if (activeKey) {
-        localStorage.setItem(activeKey, JSON.stringify({ mode: "write" }));
+        sessionStorage.setItem(activeKey, JSON.stringify({ mode: "write" }));
       }
       return;
     }
 
     if (!activeKey) return;
 
-    const activeRaw = localStorage.getItem(activeKey);
+    const activeRaw = sessionStorage.getItem(activeKey);
     if (!activeRaw) return;
 
     try {
@@ -229,7 +258,7 @@ export default function WriteLetterPage() {
         setEditContext(undefined);
       }
     } catch {
-      localStorage.removeItem(activeKey);
+      sessionStorage.removeItem(activeKey);
     }
   }, [userid, navState, activeKey]);
 
@@ -250,9 +279,16 @@ export default function WriteLetterPage() {
   }, [draftKey]);
 
   useEffect(() => {
+    return () => {
+      if (draftKey) sessionStorage.removeItem(draftKey);
+      if (activeKey) sessionStorage.removeItem(activeKey);
+    };
+  }, [draftKey, activeKey]);
+
+  useEffect(() => {
     if (!draftKey || navState?.mode !== "edit") return;
 
-    const existingRaw = localStorage.getItem(draftKey);
+    const existingRaw = sessionStorage.getItem(draftKey);
     if (existingRaw) {
       try {
         const existing = JSON.parse(existingRaw) as {
@@ -266,7 +302,7 @@ export default function WriteLetterPage() {
           return;
         }
       } catch {
-        localStorage.removeItem(draftKey);
+          sessionStorage.removeItem(draftKey);
       }
     }
 
@@ -277,7 +313,7 @@ export default function WriteLetterPage() {
     };
 
     try {
-      localStorage.setItem(draftKey, JSON.stringify(editSeed));
+      sessionStorage.setItem(draftKey, JSON.stringify(editSeed));
     } catch (e) {
       console.error("Failed to seed edit draft:", e);
     }
@@ -286,21 +322,21 @@ export default function WriteLetterPage() {
   useEffect(() => {
     if (!draftKey || !userid) return;
 
-    let raw = localStorage.getItem(draftKey);
+    let raw = sessionStorage.getItem(draftKey);
     if (!raw) {
       const legacyKeys = new Set<string>();
       const legacySingle = `writeLetterDraft:${userid}`;
-      if (localStorage.getItem(legacySingle)) {
+      if (sessionStorage.getItem(legacySingle)) {
         legacyKeys.add(legacySingle);
       }
 
       const legacyPrefix = `writeLetterDraft:${userid}:`;
-      Object.keys(localStorage).forEach((key) => {
+      Object.keys(sessionStorage).forEach((key) => {
         if (key.startsWith(legacyPrefix)) legacyKeys.add(key);
       });
 
       for (const legacyKey of legacyKeys) {
-        const legacyRaw = localStorage.getItem(legacyKey);
+        const legacyRaw = sessionStorage.getItem(legacyKey);
         if (!legacyRaw) continue;
 
         let targetKey = `writeLetterDraft:${userid}:create`;
@@ -313,14 +349,14 @@ export default function WriteLetterPage() {
             targetKey = `writeLetterDraft:${userid}:edit:${parsed.letterNumber}`;
           }
         } catch {
-          localStorage.removeItem(legacyKey);
+          sessionStorage.removeItem(legacyKey);
           continue;
         }
 
-        if (!localStorage.getItem(targetKey)) {
-          localStorage.setItem(targetKey, legacyRaw);
+        if (!sessionStorage.getItem(targetKey)) {
+          sessionStorage.setItem(targetKey, legacyRaw);
         }
-        localStorage.removeItem(legacyKey);
+        sessionStorage.removeItem(legacyKey);
 
         if (targetKey === draftKey) {
           raw = legacyRaw;
@@ -368,7 +404,7 @@ export default function WriteLetterPage() {
       }
     } catch (e) {
       console.error("Failed to parse draft:", e);
-      localStorage.removeItem(draftKey);
+      sessionStorage.removeItem(draftKey);
     } finally {
       setDraftChecked(true);
     }
@@ -386,7 +422,7 @@ export default function WriteLetterPage() {
       !!content;
 
     if (!hasData) {
-      localStorage.removeItem(draftKey);
+      sessionStorage.removeItem(draftKey);
       return;
     }
 
@@ -403,7 +439,7 @@ export default function WriteLetterPage() {
     };
 
     try {
-      localStorage.setItem(draftKey, JSON.stringify(draft));
+      sessionStorage.setItem(draftKey, JSON.stringify(draft));
       if (activeKey) {
         if (isEdit && editLetterNumber && editPassword) {
           const nextActive: ActiveDraft = {
@@ -411,9 +447,9 @@ export default function WriteLetterPage() {
             letterNumber: editLetterNumber,
             password: editPassword,
           };
-          localStorage.setItem(activeKey, JSON.stringify(nextActive));
+          sessionStorage.setItem(activeKey, JSON.stringify(nextActive));
         } else if (!isEdit) {
-          localStorage.setItem(activeKey, JSON.stringify({ mode: "write" }));
+          sessionStorage.setItem(activeKey, JSON.stringify({ mode: "write" }));
         }
       }
     } catch (e) {
@@ -538,10 +574,10 @@ export default function WriteLetterPage() {
       }
 
       if (draftKey) {
-        localStorage.removeItem(draftKey);
+      sessionStorage.removeItem(draftKey);
       }
       if (activeKey) {
-        localStorage.removeItem(activeKey);
+        sessionStorage.removeItem(activeKey);
       }
       navigate(`/users/${userid}`);
     } catch (e) {
