@@ -362,7 +362,7 @@ export default function GuestUserHomePage() {
     // ✅ 추가: 25일 이후 작성 페이지 이동 막기
     if (isWriteLocked) return;
 
-    navigate(`/users/${userid}/letters`);
+    navigate(`/users/${userid}/letters`, { state: { mode: "write" } });
   };
 
   if (userOk === null) {

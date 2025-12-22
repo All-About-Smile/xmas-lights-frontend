@@ -56,15 +56,15 @@ export default function LoginPage() {
     <AuthLayout
       title="로그인"
       headerSlot={
-        <header className="flex items-center justify-between">
+        <header className="select-none caret-transparent flex items-center justify-between">
           <ServiceTitle className="text-neutral-900" />
           <HomeButton to="/" ariaLabel="홈으로" />
         </header>
       }
     >
-      <form onSubmit={handleSubmit} className="space-y-8">
+      <form onSubmit={handleSubmit} className="space-y-8 select-none caret-transparent">
         <div className="space-y-2">
-          <Label className="text-base font-medium">아이디</Label>
+          <Label className="select-none caret-transparent text-base font-medium">아이디</Label>
           <Input
             value={id}
             onChange={(e) => setId(e.target.value)}
