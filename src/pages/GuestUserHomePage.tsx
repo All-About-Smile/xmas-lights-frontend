@@ -10,6 +10,7 @@ import { SLOTS, PAGE_SIZE } from "@/components/scene/sceneSlots";
 import { BULB_IMAGES } from "@/components/scene/bulbImages";
 import type { BulbItem } from "@/components/scene/types";
 
+
 import {
   deleteUserLetter,
   getUserLetters,
@@ -21,6 +22,7 @@ import HomeButton from "@/components/navigation/HomeButton";
 import PageIndicator from "@/components/common/PageIndicator";
 import ServiceTitle from "@/components/common/ServiceTitle";
 import WindowHeader from "@/components/common/WindowHeader";
+import InfoButton from "../components/InfoButton";
 
 // ✅ 추가: GateContext
 import { useGate } from "@/contexts/GateContext";
@@ -53,6 +55,18 @@ export default function GuestUserHomePage() {
   const [pw, setPw] = useState("");
   const [pwError, setPwError] = useState<string | null>(null);
   const [confirmLoading, setConfirmLoading] = useState(false);
+
+  const [openHelp, setOpenHelp] = useState(false);
+
+  // hover로 열리게(데스크탑), 클릭으로도 토글(모바일)
+  const helpHandlers = useMemo(
+    () => ({
+      onMouseEnter: () => setOpenHelp(true),
+      onMouseLeave: () => setOpenHelp(false),
+      onClick: () => setOpenHelp((v) => !v),
+    }),
+    []
+  );
 
   // ✅ userid 바뀌면 초기화 + 유저 존재 확인
   useEffect(() => {
@@ -381,7 +395,35 @@ export default function GuestUserHomePage() {
       <div className="mx-auto max-w-[var(--layout-max-width)] px-[var(--layout-side-padding)] pt-8 pb-6">
         <header className="flex items-center justify-between">
           <ServiceTitle className="text-neutral-900" />
+          <div className="flex items-center gap-2">
+          {/* info button */}
+            <div className="relative z-[9999]">
+              <InfoButton ariaLabel="사용법 안내" {...helpHandlers} />
+  
+              {/* popover */}
+              <div
+                  className={`absolute right-0 top-11 w-[280px] rounded-xl bg-[#F7F1E6] p-4 text-base text-neutral-900 shadow-lg transition-all
+                ${openHelp ? "opacity-100 translate-y-0" : "pointer-events-none opacity-0 -translate-y-1"}`}
+              >
+                <div className="font-semibold">✍️ 편지 작성 방법</div>
+                <ol className="mt-2 list-decimal space-y-1 pl-5 leading-5">
+                  <li>편지를 남길 지인의 창문으로 이동해 줘~</li>
+                  <li>창문을 밝혀줄 전구와 색상을 선택해 봐!</li>
+                  <li>따뜻한 메시지로 마음을 전달해 보자~!</li>
+                </ol>
+                <p>💌 로그인하지 않아도 편지 남길 수 있어! <div className="text-[#006F57] font-medium">(❁´◡`❁)</div></p>
+                <br />
+  
+                <div className="font-semibold">✨창문 생성 방법 (회원가입)</div>
+                <ol className="mt-2 list-decimal space-y-1 pl-5 leading-5">
+                  <li>메인 페이지에서 “로그인하기” 버튼 클릭! 또는</li>
+                  <li>지인의 창문 페이지에서 “홈” 버튼 클릭!</li>
+                </ol>
+                  <p>💌 작성한 메시지는 12월 25일에 공개될 거야!<div className="text-[#BB010B] font-medium">(ღˇᴗˇ)｡o♡</div></p>
+              </div>
+            </div>
           <HomeButton to="/" ariaLabel="메인으로" />
+          </div>
         </header>
 
         <WindowHeader className="mt-6" displayName={displayName} />
