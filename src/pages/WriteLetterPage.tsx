@@ -169,6 +169,28 @@ export default function WriteLetterPage() {
   }, [userid, isEdit, editLetterNumber]);
 
   const prevDraftKeyRef = useRef<string | null>(null);
+  const entryCheckedRef = useRef(false);
+
+  useEffect(() => {
+    if (!userid || entryCheckedRef.current) return;
+
+    const navEntries = performance.getEntriesByType("navigation") as PerformanceNavigationTiming[];
+    const isReload =
+      navEntries?.[0]?.type === "reload" ||
+      (performance as any).navigation?.type === 1;
+
+    if (!isReload) {
+      const legacySingle = `writeLetterDraft:${userid}`;
+      const prefix = `writeLetterDraft:${userid}:`;
+
+      sessionStorage.removeItem(legacySingle);
+      Object.keys(sessionStorage).forEach((key) => {
+        if (key.startsWith(prefix)) sessionStorage.removeItem(key);
+      });
+    }
+
+    entryCheckedRef.current = true;
+  }, [userid]);
 
   // ✅ useMemo도 hook이므로 항상 실행되게 위치 고정
   const bulbSrc = useMemo(() => {
