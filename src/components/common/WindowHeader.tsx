@@ -16,13 +16,8 @@ export default function WindowHeader({
   className,
   afterOpenMessage,
 }: WindowHeaderProps) {
-  const { isOpen, daysLeft, hoursLeft, minutesLeft } = getTimeUntilOpen();
-  const timeLeftText =
-    daysLeft === 0
-      ? hoursLeft === 0
-        ? `개봉까지 ${minutesLeft}분`
-        : `개봉까지 ${hoursLeft}시간 ${minutesLeft}분`
-      : `개봉까지 ${daysLeft}일`;
+  const { isOpen, daysLeft } = getTimeUntilOpen();
+  const timeLeftText = `개봉까지 ${daysLeft + 1}일`;
 
   const options = useMemo(() => {
     if (isOpen) {
