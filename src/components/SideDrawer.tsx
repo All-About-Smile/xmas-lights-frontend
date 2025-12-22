@@ -74,6 +74,15 @@ export default function SideDrawer({ open, onClose }: SideDrawerProps) {
           >
             내 창문 보러가기
           </Link>
+          <a
+            href={`${window.location.origin}/users/admin`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block py-4"
+            onClick={onClose}
+          >
+            개발자 창문 보러가기
+          </a>
 
           <Link
             to="/help"
