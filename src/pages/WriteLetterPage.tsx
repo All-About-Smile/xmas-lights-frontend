@@ -505,6 +505,7 @@ export default function WriteLetterPage() {
 
   const onBack = () => {
     if (step === 2) setStep(1);
+    else if (userid) navigate(`/users/${userid}`);
     else navigate(-1);
   };
 
