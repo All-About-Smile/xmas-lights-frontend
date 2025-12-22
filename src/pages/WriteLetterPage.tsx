@@ -120,6 +120,13 @@ export default function WriteLetterPage() {
   const location = useLocation();
   const navState = location.state as NavState;
 
+  useEffect(() => {
+    document.body.classList.add("allow-scroll");
+    return () => {
+      document.body.classList.remove("allow-scroll");
+    };
+  }, []);
+
   const [editContext, setEditContext] = useState<EditNavState>(
     navState?.mode === "edit" ? navState : undefined,
   );
