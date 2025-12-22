@@ -92,3 +92,24 @@ export function getDaysUntilOpen(now: Date = new Date()): number {
   return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 }
 
+export function getTimeUntilOpen(now: Date = new Date()): {
+  isOpen: boolean;
+  daysLeft: number;
+  hoursLeft: number;
+  minutesLeft: number;
+} {
+  const openAtUTC = getOpenAtUTC(now.getUTCFullYear());
+  const diffMs = openAtUTC.getTime() - now.getTime();
+
+  if (diffMs <= 0) {
+    return { isOpen: true, daysLeft: 0, hoursLeft: 0, minutesLeft: 0 };
+  }
+
+  const totalMinutes = Math.ceil(diffMs / (1000 * 60));
+  const daysLeft = Math.floor(totalMinutes / (60 * 24));
+  const hoursLeft = Math.floor((totalMinutes - daysLeft * 60 * 24) / 60);
+  const minutesLeft = totalMinutes % 60;
+
+  return { isOpen: false, daysLeft, hoursLeft, minutesLeft };
+}
+

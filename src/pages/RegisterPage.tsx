@@ -7,8 +7,45 @@ import { AuthLayout } from "../layouts/AuthLayout";
 import Input from "../components/ui/Input";
 import Label from "../components/ui/Label";
 import Button from "../components/ui/Button";
+import HomeButton from "../components/navigation/HomeButton";
+import ServiceTitle from "../components/common/ServiceTitle";
 
 import { authApi } from "../api/authApi";
+
+function RegisterSuccessModal({
+  open,
+  onConfirm,
+}: {
+  open: boolean;
+  onConfirm: () => void;
+}) {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/40">
+      <div
+        className="w-[360px] max-w-[90vw] rounded-2xl bg-white p-6 shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="text-2xl font-extrabold text-neutral-900">
+          회원가입 완료
+        </div>
+        <div className="mt-2 text-lg text-neutral-700">
+          회원가입이 완료되었습니다!
+        </div>
+        <div className="mt-6 flex justify-end">
+          <button
+            type="button"
+            onClick={onConfirm}
+            className="rounded-xl bg-[#4B6B12] px-4 py-2 text-xl font-semibold text-white shadow"
+          >
+            로그인 하러가기
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function RegisterPage() {
   const navigate = useNavigate();
@@ -20,6 +57,7 @@ function RegisterPage() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   // ✅ 유효성 검사 정규식
 
@@ -80,15 +118,15 @@ function RegisterPage() {
         email,
         password,
       });
-      alert("회원가입이 완료되었습니다!");
+      setShowSuccessModal(true);
 
       // ✅ 가입 성공 → 로그인 페이지로 이동
-      navigate("/login", { replace: true });
+      // 로그인 이동은 모달 확인 후 진행
     } catch (err: any) {
       console.error("REGISTER ERROR:", err);
 
       const status = err?.response?.status;
-      if (status === 409) setErrorMsg("이미 존재하는 아이디/이메일이야.");
+      if (status === 400) setErrorMsg("이미 존재하는 아이디/이메일이야.");
       else if (status === 422) setErrorMsg("입력값 형식이 올바르지 않아(422).");
       else setErrorMsg("회원가입에 실패했어. 서버/네트워크를 확인해줘.");
     } finally {
@@ -97,7 +135,19 @@ function RegisterPage() {
   };
 
   return (
-    <AuthLayout title="회원가입">
+    <AuthLayout
+      title="회원가입"
+      headerSlot={
+        <header className="flex items-center justify-between">
+          <ServiceTitle className="text-neutral-900" />
+          <HomeButton to="/" ariaLabel="홈으로" />
+        </header>
+      }
+    >
+      <RegisterSuccessModal
+        open={showSuccessModal}
+        onConfirm={() => navigate("/login", { replace: true })}
+      />
       <form onSubmit={handleSubmit} className="space-y-8">
         <div className="space-y-2">
           <Label className="text-base font-medium">아이디</Label>
@@ -116,7 +166,7 @@ function RegisterPage() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="4자+영문+숫자"
+            placeholder="4자 이상+영문+숫자"
             autoComplete="new-password"
             className="h-14 rounded-xl border-none bg-[#F8EFD4] shadow-[0_4px_10px_rgba(0,0,0,0.08)]"
           />
@@ -145,7 +195,7 @@ function RegisterPage() {
           />
         </div>
 
-        {errorMsg && <p className="text-sm text-red-600">{errorMsg}</p>}
+        {errorMsg && <p className="text-base text-red-600">{errorMsg}</p>}
 
         <div className="pt-4">
           <Button
@@ -156,7 +206,7 @@ function RegisterPage() {
           </Button>
         </div>
 
-        <div className="text-center text-sm text-neutral-900">
+        <div className="text-center text-base text-neutral-900">
           이미 계정이 있어? <Link to="/login">로그인</Link>
         </div>
       </form>

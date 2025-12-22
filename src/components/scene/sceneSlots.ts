@@ -7,7 +7,7 @@ export const PAGE_SIZE = 8;
  */
 export const SLOTS = [
   // row 1 (3) : 1번째 전선(상단)
-  { left: "28%", top: "36.5%" },
+  { left: "28%", top: "37.5%" },
   { left: "50%", top: "36%" },
   { left: "72%", top: "32%" },
 
