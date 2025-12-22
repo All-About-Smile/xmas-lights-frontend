@@ -52,10 +52,10 @@ export default function HelpPage() {
 
                 <section>
                   <div className="font-semibold">✨창문 생성 방법 (회원가입)</div>
-                  <ol className="mt-2 list-decimal space-y-1 pl-5 leading-5">
+                  <ul className="mt-2 list-disc space-y-1 pl-5 leading-5">
                     <li>메인 페이지에서 “로그인하기” 버튼 클릭! 또는</li>
                     <li>지인의 창문 페이지에서 “홈” 버튼 클릭!</li>
-                  </ol>
+                  </ul>
                   <p className="mt-3">
                     💌 작성한 메시지는 12월 25일에 공개될 거야!
                     <span className="text-[#BB010B] font-medium">(ღˇᴗˇ)｡o♡</span>
