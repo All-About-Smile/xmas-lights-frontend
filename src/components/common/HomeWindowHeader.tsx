@@ -16,7 +16,7 @@ export default function WindowHeader({
   className,
   afterOpenMessage,
 }: WindowHeaderProps) {
-  const { isOpen, daysLeft } = getTimeUntilOpen();
+  const { isOpen, daysLeft} = getTimeUntilOpen();
   const timeLeftText = `개봉까지 ${daysLeft + 1}일`;
 
   const options = useMemo(() => {
@@ -31,16 +31,28 @@ export default function WindowHeader({
 
     return [
       {
-        top: `${timeLeftText}...`,
-        bottom: "지금당장 편지💌 써야겠지?",
+        top: `${timeLeftText}..🎅`,
+        bottom: "어떤 편지💌가 날 기다릴까?",
       },
       {
-        top: `${timeLeftText}!`,
-        bottom: "따뜻한 한 줄 남겨볼래?☕",
+        top: `${timeLeftText}!🎅`,
+        bottom: "창문이 예뻐지고 있어~☕",
       },
       {
-        top: `${timeLeftText} 남았어.`,
-        bottom: "전구💡에 마음을 밝혀줘!",
+        top: `${timeLeftText} 남았어🎅`,
+        bottom: "어떤 전구💡가 달릴까?",
+      },
+      {
+        top: `${timeLeftText} 남았어🎅`,
+        bottom: "곧... 창문에 담긴 마음들이 열리겠지!?",
+      },
+      {
+        top: `${timeLeftText} 남았어🎅`,
+        bottom: "그동안 창문은 전구들로 채워질 거라구~!",
+      },
+      {
+        top: `${timeLeftText} 남았어🎅`,
+        bottom: "기다리는 시간이 이렇게 좋은 거였나 봐...ㅎㅎ",
       },
     ];
   }, [afterOpenMessage?.bottom, afterOpenMessage?.top, isOpen, timeLeftText]);
