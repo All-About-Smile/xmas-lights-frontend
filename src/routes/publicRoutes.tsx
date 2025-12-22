@@ -9,6 +9,7 @@ import GuestUserHomePage from "@/pages/GuestUserHomePage";
 import NotFoundPage from "@/pages/NotFoundPage";
 import WriteLetterPage from "@/pages/WriteLetterPage";
 import WriteLockGuard from "./WriteLockGuard";
+import HelpPage from "@/pages/HelpPage";
 
 export function publicRoutes(isAuthenticated: boolean): RouteObject[] {
   return [
@@ -23,6 +24,10 @@ export function publicRoutes(isAuthenticated: boolean): RouteObject[] {
     {
       path: "/register",
       element: isAuthenticated ? <Navigate to="/home" replace /> : <RegisterPage />,
+    },
+    {
+      path: "/help",
+      element: <HelpPage />,
     },
     {
       path: "/account/find",

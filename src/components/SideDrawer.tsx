@@ -74,6 +74,14 @@ export default function SideDrawer({ open, onClose }: SideDrawerProps) {
           >
             내 창문 보러가기
           </Link>
+
+          <Link
+            to="/help"
+            className="block py-4"
+            onClick={onClose}
+          >
+            도움말
+          </Link>
         </nav>
 
         <div className="mt-6 h-px bg-black/10" />
