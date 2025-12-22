@@ -27,7 +27,7 @@ export default function LandingPage() {
   );
 
   return (
-    <div className="min-h-screen bg-[#D8D1CE]">
+    <div className="select-none caret-transparent min-h-screen bg-[#D8D1CE]">
       <div className="mx-auto max-w-[var(--layout-max-width)] px-[var(--layout-side-padding)] pt-8 pb-10">
         {/* top bar */}
         <header className="flex items-center justify-between">

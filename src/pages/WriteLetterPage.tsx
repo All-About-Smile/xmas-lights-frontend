@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import LetterSheet from "@/components/letter/LetterSheet";
@@ -52,6 +52,16 @@ type EditNavState =
       password: string;
     }
   | undefined;
+
+type NavState = EditNavState | { mode: "write" } | undefined;
+
+type ActiveDraft =
+  | {
+      mode: "edit";
+      letterNumber: number;
+      password: string;
+    }
+  | { mode: "write" };
 
 function ConfirmSaveModal({
   open,
@@ -108,9 +118,11 @@ export default function WriteLetterPage() {
   const { userid } = useParams<{ userid: string }>();
   const navigate = useNavigate();
   const location = useLocation();
-  const navState = location.state as EditNavState;
+  const navState = location.state as NavState;
 
-  const [editContext, setEditContext] = useState<EditNavState>(navState);
+  const [editContext, setEditContext] = useState<EditNavState>(
+    navState?.mode === "edit" ? navState : undefined,
+  );
 
   const isEdit = editContext?.mode === "edit";
   const editLetterNumber = isEdit ? editContext!.letterNumber : null;
@@ -136,10 +148,20 @@ export default function WriteLetterPage() {
   const [hasDraft, setHasDraft] = useState(false);
   const [draftChecked, setDraftChecked] = useState(false);
 
+  const activeKey = useMemo(() => {
+    if (!userid) return null;
+    return `writeLetterDraft:${userid}:active`;
+  }, [userid]);
+
   const draftKey = useMemo(() => {
     if (!userid) return null;
-    return `writeLetterDraft:${userid}`;
-  }, [userid]);
+    if (isEdit && editLetterNumber) {
+      return `writeLetterDraft:${userid}:edit:${editLetterNumber}`;
+    }
+    return `writeLetterDraft:${userid}:create`;
+  }, [userid, isEdit, editLetterNumber]);
+
+  const prevDraftKeyRef = useRef<string | null>(null);
 
   // ✅ useMemo도 hook이므로 항상 실행되게 위치 고정
   const bulbSrc = useMemo(() => {
@@ -167,10 +189,65 @@ export default function WriteLetterPage() {
   }, [isEdit, ornamentShape, ornamentColor, writerNickname, passwordForEdit, bulbSrc]);
 
   useEffect(() => {
+    if (!userid) return;
+
     if (navState?.mode === "edit") {
       setEditContext(navState);
+      if (activeKey) {
+        const nextActive: ActiveDraft = {
+          mode: "edit",
+          letterNumber: navState.letterNumber,
+          password: navState.password,
+        };
+        localStorage.setItem(activeKey, JSON.stringify(nextActive));
+      }
+      return;
     }
-  }, [navState]);
+
+    if (navState?.mode === "write") {
+      setEditContext(undefined);
+      if (activeKey) {
+        localStorage.setItem(activeKey, JSON.stringify({ mode: "write" }));
+      }
+      return;
+    }
+
+    if (!activeKey) return;
+
+    const activeRaw = localStorage.getItem(activeKey);
+    if (!activeRaw) return;
+
+    try {
+      const active = JSON.parse(activeRaw) as ActiveDraft;
+      if (active.mode === "edit" && active.letterNumber && active.password) {
+        setEditContext({
+          mode: "edit",
+          letterNumber: active.letterNumber,
+          password: active.password,
+        });
+      } else {
+        setEditContext(undefined);
+      }
+    } catch {
+      localStorage.removeItem(activeKey);
+    }
+  }, [userid, navState, activeKey]);
+
+  useEffect(() => {
+    if (!draftKey || draftKey === prevDraftKeyRef.current) return;
+
+    prevDraftKeyRef.current = draftKey;
+    setStep(1);
+    setOrnamentShape("");
+    setOrnamentColor("");
+    setWriterNickname("");
+    setPasswordForEdit("");
+    setContent("");
+    setHasDraft(false);
+    setDraftChecked(false);
+    setEditLoaded(false);
+    setEditLoading(false);
+  }, [draftKey]);
 
   useEffect(() => {
     if (!draftKey || navState?.mode !== "edit") return;
@@ -211,16 +288,43 @@ export default function WriteLetterPage() {
 
     let raw = localStorage.getItem(draftKey);
     if (!raw) {
-      const legacyPrefix = `writeLetterDraft:${userid}:`;
-      const legacyKey = Object.keys(localStorage).find((key) =>
-        key.startsWith(legacyPrefix),
-      );
+      const legacyKeys = new Set<string>();
+      const legacySingle = `writeLetterDraft:${userid}`;
+      if (localStorage.getItem(legacySingle)) {
+        legacyKeys.add(legacySingle);
+      }
 
-      if (legacyKey) {
-        raw = localStorage.getItem(legacyKey);
-        if (raw) {
+      const legacyPrefix = `writeLetterDraft:${userid}:`;
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith(legacyPrefix)) legacyKeys.add(key);
+      });
+
+      for (const legacyKey of legacyKeys) {
+        const legacyRaw = localStorage.getItem(legacyKey);
+        if (!legacyRaw) continue;
+
+        let targetKey = `writeLetterDraft:${userid}:create`;
+        try {
+          const parsed = JSON.parse(legacyRaw) as {
+            mode?: "edit";
+            letterNumber?: number;
+          };
+          if (parsed.mode === "edit" && parsed.letterNumber) {
+            targetKey = `writeLetterDraft:${userid}:edit:${parsed.letterNumber}`;
+          }
+        } catch {
           localStorage.removeItem(legacyKey);
-          localStorage.setItem(draftKey, raw);
+          continue;
+        }
+
+        if (!localStorage.getItem(targetKey)) {
+          localStorage.setItem(targetKey, legacyRaw);
+        }
+        localStorage.removeItem(legacyKey);
+
+        if (targetKey === draftKey) {
+          raw = legacyRaw;
+          break;
         }
       }
     }
@@ -242,14 +346,6 @@ export default function WriteLetterPage() {
         passwordForEdit?: string;
         content?: string;
       };
-
-      if (draft.mode === "edit" && draft.letterNumber && draft.password) {
-        setEditContext({
-          mode: "edit",
-          letterNumber: draft.letterNumber,
-          password: draft.password,
-        });
-      }
 
       if (draft.ornamentShape) setOrnamentShape(draft.ornamentShape);
       if (draft.ornamentColor) setOrnamentColor(draft.ornamentColor);
@@ -308,11 +404,24 @@ export default function WriteLetterPage() {
 
     try {
       localStorage.setItem(draftKey, JSON.stringify(draft));
+      if (activeKey) {
+        if (isEdit && editLetterNumber && editPassword) {
+          const nextActive: ActiveDraft = {
+            mode: "edit",
+            letterNumber: editLetterNumber,
+            password: editPassword,
+          };
+          localStorage.setItem(activeKey, JSON.stringify(nextActive));
+        } else if (!isEdit) {
+          localStorage.setItem(activeKey, JSON.stringify({ mode: "write" }));
+        }
+      }
     } catch (e) {
       console.error("Failed to save draft:", e);
     }
   }, [
     draftKey,
+    activeKey,
     editLoaded,
     draftChecked,
     isEdit,
@@ -396,6 +505,7 @@ export default function WriteLetterPage() {
 
   const onBack = () => {
     if (step === 2) setStep(1);
+    else if (userid) navigate(`/users/${userid}`);
     else navigate(-1);
   };
 
@@ -429,6 +539,9 @@ export default function WriteLetterPage() {
 
       if (draftKey) {
         localStorage.removeItem(draftKey);
+      }
+      if (activeKey) {
+        localStorage.removeItem(activeKey);
       }
       navigate(`/users/${userid}`);
     } catch (e) {
