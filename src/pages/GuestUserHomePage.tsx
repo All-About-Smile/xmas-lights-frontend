@@ -40,6 +40,7 @@ export default function GuestUserHomePage() {
 
   const [bulbs, setBulbs] = useState<BulbItem[]>([]);
   const [hasNext, setHasNext] = useState(false);
+  const [totalPages, setTotalPages] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
 
   // ✅ 유저 존재 검증 상태
@@ -75,6 +76,7 @@ export default function GuestUserHomePage() {
     setOffset(0);
     setBulbs([]);
     setHasNext(false);
+    setTotalPages(null);
     setUserOk(null);
 
     if (!userid) {
@@ -145,6 +147,7 @@ export default function GuestUserHomePage() {
 
       setBulbs(mapped);
       setHasNext(result.hasNext);
+      setTotalPages(result.totalPages);
     } catch (e) {
       if (axios.isAxiosError(e) && e.response?.status === 404) {
         navigate("/404", { replace: true });
@@ -164,10 +167,10 @@ export default function GuestUserHomePage() {
   }, [userOk, offset, userid]);
 
   const pageIndex = Math.floor(offset / PAGE_SIZE) + 1;
-  const pageCount = useMemo(
-    () => (hasNext ? pageIndex + 1 : pageIndex),
-    [hasNext, pageIndex]
-  );
+  const pageCount = useMemo(() => {
+    if (typeof totalPages === "number") return totalPages;
+    return hasNext ? pageIndex + 1 : pageIndex;
+  }, [hasNext, pageIndex, totalPages]);
 
   const onPrev = () => {
     if (!hasPrev || loading) return;
