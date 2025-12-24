@@ -58,6 +58,7 @@ export default function HomePage() {
   // 현재 페이지의 전구 0~8개
   const [bulbs, setBulbs] = useState<BulbItem[]>([]);
   const [hasNext, setHasNext] = useState(false);
+  const [totalPages, setTotalPages] = useState<number | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [showLockedPopup, setShowLockedPopup] = useState(false);
@@ -98,6 +99,7 @@ export default function HomePage() {
   // 유저가 바뀌면 첫 페이지로
   useEffect(() => {
     setOffset(0);
+    setTotalPages(null);
   }, [userid]);
 
   // 현재 페이지(8개) 불러오기
@@ -135,6 +137,7 @@ export default function HomePage() {
 
         setBulbs(mapped);
         setHasNext(result.hasNext);
+        setTotalPages(result.totalPages);
 
         // ✅ serverDate는 GateContext에 저장 (안전 파싱)
         if (result.serverDate) {
@@ -163,10 +166,10 @@ export default function HomePage() {
 
   // 페이지 표시는 총 개수 없으니 최소 추정 (hasNext면 +1)
   const pageIndex = Math.floor(offset / PAGE_SIZE) + 1;
-  const pageCount = useMemo(
-    () => (hasNext ? pageIndex + 1 : pageIndex),
-    [hasNext, pageIndex]
-  );
+  const pageCount = useMemo(() => {
+    if (typeof totalPages === "number") return totalPages;
+    return hasNext ? pageIndex + 1 : pageIndex;
+  }, [hasNext, pageIndex, totalPages]);
 
   const onPrev = () => {
     if (!hasPrev || loading) return;

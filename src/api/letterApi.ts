@@ -36,6 +36,8 @@ export async function getUserLetters(params: {
   limit: number;
   offset: number;
   hasNext: boolean;
+  totalCount: number;
+  totalPages: number;
   serverDate: Date | null;
 }> {
   const { userid, limit, offset } = params;
@@ -53,6 +55,8 @@ export async function getUserLetters(params: {
     limit: res.data.data.limit,
     offset: res.data.data.offset,
     hasNext: res.data.data.has_next,
+    totalCount: res.data.data.total_count,
+    totalPages: res.data.data.total_pages,
     serverDate,
   };
 }
